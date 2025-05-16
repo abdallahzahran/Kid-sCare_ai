@@ -1,0 +1,152 @@
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:kidscare/core/utils/app_assets.dart';
+import 'package:kidscare/core/utils/app_colors.dart';
+import 'package:kidscare/core/widget/custom_elvated_btn.dart';
+import 'package:kidscare/core/widget/custom_svg.dart';
+import 'package:kidscare/core/widget/custom_text_form.dart';
+import 'package:kidscare/features/auth/views/login_view.dart';
+import 'package:kidscare/features/splash/views/add_kid.dart';
+import '../../../core/helper/my_navigator.dart';
+import '../../../core/helper/my_validator.dart';
+import '../../../core/utils/app_constants.dart';
+import '../../../core/utils/app_text_styles.dart';
+import '../manager/register_cubit/register_cubit.dart';
+import '../manager/register_cubit/register_state.dart';
+
+class RegisterView extends StatelessWidget {
+  const RegisterView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: BlocProvider(
+        create: (BuildContext context) => RegisterCubit(),
+        child: Builder(
+          builder: (context) {
+            return BlocConsumer<RegisterCubit, RegisterState>(
+              listener: (context, state) {
+                if (state is RegisterSuccessState) {
+                  MyNavigator.goTo(
+                    screen: () => LoginView(),
+                    isReplace: true,
+                  );
+                  Get.offAllNamed('/add_kid');
+                } else if (state is RegisterErrorState) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(state.error))
+                  );
+                  MyNavigator.goTo(
+                    screen: () => AddKidSplachView(),
+
+                  );
+
+                }
+              },
+              builder: (context, state) {
+                var cubit = RegisterCubit.get(context);
+                return Form(
+                  key: cubit.formKey,
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AppConstants.sizedBoxHeight(context, 0.02),
+                          CustomSvg(assetPath: AppAssets.logo),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.01,
+                          ),
+                          CustomTextFormField(
+                            label: 'Username',
+                            textStyle: AppTextStyles.first,
+                            prefixIconPath: AppAssets.user,
+                            controller: cubit.usernameController,
+                            validator: RequiredValidator(),
+                          ),
+                          CustomTextFormField(
+                            label: 'Email',
+                            textStyle: AppTextStyles.first,
+                            prefixIconPath: AppAssets.user,
+                            controller: cubit.emailController,
+                            validator: EmailValidator(),
+                          ),
+                          CustomTextFormField(
+                            label: 'Password',
+                            textStyle: AppTextStyles.first,
+                            prefixIconPath: AppAssets.password,
+                            suffixIconPath:
+                            cubit.isPasswordVisible
+                                ? AppAssets.passwordEnable
+                                : AppAssets.passwordDisable,
+                            obscureText: !cubit.isPasswordVisible,
+                            controller: cubit.passwordController,
+                            validator: PasswordValidator(),
+                            onSuffixIconTap: () {
+                              cubit.togglePasswordVisibility();
+                            },
+                          ),
+                          CustomTextFormField(
+                            label: 'Confirm Password',
+                            textStyle: AppTextStyles.first,
+                            prefixIconPath: AppAssets.password,
+                            suffixIconPath:
+                            cubit.isConfirmPasswordVisible
+                                ? AppAssets.passwordEnable
+                                : AppAssets.passwordDisable,
+                            obscureText: !cubit.isConfirmPasswordVisible,
+                            controller: cubit.confirmPasswordController,
+                            validator: PasswordValidator(),
+                            onSuffixIconTap: () {
+                              cubit.toggleConfirmPasswordVisibility();
+                            },
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                          state is RegisterLoadingState
+                              ? const CircularProgressIndicator()
+                              : CustomElevatedButton(
+                            textButton: 'Register',
+                            onPressed: () {
+                              cubit.onRegisterPressed();
+                            },
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.05,
+                          ),
+                          RichText(
+                            text: TextSpan(
+                              text: 'Already have an account?  ',
+                              style: DefaultTextStyle.of(context).style,
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: 'Login',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.yellow,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Get.offAllNamed('/login');
+                                    },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

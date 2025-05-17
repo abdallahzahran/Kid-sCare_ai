@@ -5,116 +5,67 @@ class KidsService {
   factory KidsService() => _instance;
   KidsService._internal();
 
-  final List<Map<String, String>> _kids = [];
-  Map<String, String>? _firstKid;
-  String? _userName;
   String? _parentName;
   String? _parentPhotoPath;
+  List<Map<String, dynamic>> _kids = [];
 
-  List<Map<String, String>> get kids => _kids;
-  Map<String, String>? get firstKid => _firstKid;
-  String? get userName => _userName;
   String? get parentName => _parentName;
   String? get parentPhotoPath => _parentPhotoPath;
+  List<Map<String, dynamic>> get kids => List.unmodifiable(_kids);
 
-  void setUserName(String name) {
-    _userName = name;
-    CacheHelper.saveData(key: 'user_name', value: name);
-  }
-
-  void setParentName(String name) {
+  Future<void> setParentName(String name) async {
     _parentName = name;
-    CacheHelper.saveData(key: 'parent_name', value: name);
+    await CacheHelper.saveData(key: 'parentName', value: name);
   }
 
-  void setParentPhotoPath(String path) {
+  Future<void> setParentPhotoPath(String path) async {
     _parentPhotoPath = path;
-    CacheHelper.saveData(key: 'parent_photo_path', value: path);
+    await CacheHelper.saveData(key: 'parentPhotoPath', value: path);
   }
 
-  void addKid(Map<String, String> kid) {
+  Future<void> addKid(Map<String, dynamic> kid) async {
     _kids.add(kid);
-    if (_firstKid == null) {
-      _firstKid = kid;
-      // Store first kid info in cache
-      CacheHelper.saveData(key: 'first_kid_name', value: kid['name'] ?? '');
-      CacheHelper.saveData(key: 'first_kid_email', value: kid['email'] ?? '');
-      CacheHelper.saveData(key: 'first_kid_age', value: kid['age'] ?? '');
-    }
+    await _saveKidsData();
   }
 
-  void updateKid(int index, Map<String, String> kid) {
-    if (index >= 0 && index < _kids.length) {
-      _kids[index] = kid;
-      // If updating first kid, update cache
-      if (index == 0) {
-        _firstKid = kid;
-        CacheHelper.saveData(key: 'first_kid_name', value: kid['name'] ?? '');
-        CacheHelper.saveData(key: 'first_kid_email', value: kid['email'] ?? '');
-        CacheHelper.saveData(key: 'first_kid_age', value: kid['age'] ?? '');
-      }
-    }
-  }
-
-  void updateFirstKid(int index) {
-    if (index >= 0 && index < _kids.length) {
-      _firstKid = _kids[index];
-      // Update cache with new first kid info
-      CacheHelper.saveData(key: 'first_kid_name', value: _kids[index]['name'] ?? '');
-      CacheHelper.saveData(key: 'first_kid_email', value: _kids[index]['email'] ?? '');
-      CacheHelper.saveData(key: 'first_kid_age', value: _kids[index]['age'] ?? '');
-    }
-  }
-
-  void deleteKid(int index) {
+  Future<void> removeKid(int index) async {
     if (index >= 0 && index < _kids.length) {
       _kids.removeAt(index);
-      // If deleting first kid, update first kid reference
-      if (index == 0 && _kids.isNotEmpty) {
-        _firstKid = _kids[0];
-        CacheHelper.saveData(key: 'first_kid_name', value: _kids[0]['name'] ?? '');
-        CacheHelper.saveData(key: 'first_kid_email', value: _kids[0]['email'] ?? '');
-        CacheHelper.saveData(key: 'first_kid_age', value: _kids[0]['age'] ?? '');
-      } else if (_kids.isEmpty) {
-        _firstKid = null;
-        CacheHelper.removeData(key: 'first_kid_name');
-        CacheHelper.removeData(key: 'first_kid_email');
-        CacheHelper.removeData(key: 'first_kid_age');
-      }
+      await _saveKidsData();
     }
   }
 
-  // Load data from cache on app start
+  Future<void> updateKid(int index, Map<String, dynamic> updatedKid) async {
+    if (index >= 0 && index < _kids.length) {
+      _kids[index] = updatedKid;
+      await _saveKidsData();
+    }
+  }
+
+  Future<void> _saveKidsData() async {
+    await CacheHelper.saveKidsData(_kids);
+  }
+
   Future<void> loadFromCache() async {
-    // Load first kid
-    final name = CacheHelper.getData(key: 'first_kid_name');
-    final email = CacheHelper.getData(key: 'first_kid_email');
-    final age = CacheHelper.getData(key: 'first_kid_age');
-    
-    if (name != null && email != null && age != null) {
-      _firstKid = {
-        'name': name.toString(),
-        'email': email.toString(),
-        'age': age.toString(),
-      };
-    }
+    _parentName = CacheHelper.getData(key: 'parentName');
+    _parentPhotoPath = CacheHelper.getData(key: 'parentPhotoPath');
+    _kids = await CacheHelper.getKidsData();
+  }
 
-    // Load user name
-    final userName = CacheHelper.getData(key: 'user_name');
-    if (userName != null) {
-      _userName = userName.toString();
-    }
+  Future<void> clearAll() async {
+    _parentName = null;
+    _parentPhotoPath = null;
+    _kids.clear();
+    await CacheHelper.removeData(key: 'parentName');
+    await CacheHelper.removeData(key: 'parentPhotoPath');
+    await CacheHelper.removeData(key: 'kids');
+  }
 
-    // Load parent name
-    final parentName = CacheHelper.getData(key: 'parent_name');
-    if (parentName != null) {
-      _parentName = parentName.toString();
-    }
-
-    // Load parent photo path
-    final parentPhotoPath = CacheHelper.getData(key: 'parent_photo_path');
-    if (parentPhotoPath != null) {
-      _parentPhotoPath = parentPhotoPath.toString();
+  Future<void> updateFirstKid(int index) async {
+    if (index >= 0 && index < _kids.length) {
+      final kid = _kids.removeAt(index);
+      _kids.insert(0, kid);
+      await _saveKidsData();
     }
   }
 } 

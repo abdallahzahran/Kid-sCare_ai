@@ -29,7 +29,7 @@ class LoginView extends StatelessWidget {
 
     return Scaffold(
       body: BlocProvider(
-        create: (_) => LoginCubit()..checkLoginStatus(),
+        create: (_) => LoginCubit(),
         child: BlocConsumer<LoginCubit, LoginState>(
           listener: (context, state) {
             if (state is LoginSuccessState) {

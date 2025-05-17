@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:kidscare/core/cache/cache_helper.dart';
 import 'package:kidscare/core/widget/custom_elvated_btn.dart';
 import 'package:kidscare/core/widget/custom_svg.dart';
 import '../../../core/utils/app_assets.dart';
 import '../../../core/helper/my_responsive.dart';
+import '../../../core/services/navigation_service.dart';
 
 class ChooseUserView extends StatelessWidget {
-  const ChooseUserView ({super.key});
+  const ChooseUserView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,17 +27,17 @@ class ChooseUserView extends StatelessWidget {
                 SizedBox(height: verticalSpacing),
                 CustomElevatedButton(
                   textButton: 'Parent',
-                  onPressed: () {
-                    CacheHelper.saveData(key: 'userType', value: 'parent');
-                    Get.toNamed('/registerParent');
+                  onPressed: () async {
+                    await CacheHelper.saveUserType('parent');
+                    NavigationService.toRegister();
                   },
                 ),
                 SizedBox(height: verticalSpacing),
                 CustomElevatedButton(
                   textButton: 'Kid',
-                  onPressed: () {
-                    CacheHelper.saveData(key: 'userType', value: 'kid');
-                    Get.toNamed('/registerKid');
+                  onPressed: () async {
+                    await CacheHelper.saveUserType('kid');
+                    NavigationService.toRegister();
                   },
                 ),
                 SizedBox(height: verticalSpacing),

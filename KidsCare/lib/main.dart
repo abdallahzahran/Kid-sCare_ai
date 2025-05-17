@@ -12,17 +12,20 @@ import 'package:kidscare/features/auth/views/register_view.dart';
 import 'package:kidscare/features/splash/views/add_kid.dart';
 import 'package:kidscare/features/splash/views/choose_user_view.dart';
 import 'package:kidscare/features/home/views/home_view.dart';
-import 'features/time/manager/cubit/time_cubit/time_cubit.dart';
+import 'package:kidscare/core/services/kids_service.dart';
+import 'package:kidscare/features/time/manager/cubit/time_cubit/time_cubit.dart';
+import 'package:kidscare/core/services/lifecycle_service.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: WidgetsBinding.instance);
-  await CacheHelper.init();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  
+  // Initialize lifecycle service
+  await LifecycleService().initialize();
+  
   FlutterNativeSplash.remove();
-  runApp(
-      BlocProvider(
-          create: (_) => TimeCubit(),
-     child:  const KidsCareApp()));
+  
+  runApp(const KidsCareApp());
 }
 
 class KidsCareApp extends StatelessWidget {
@@ -32,24 +35,26 @@ class KidsCareApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<LoginCubit>(create: (context) => LoginCubit()),
+        BlocProvider<LoginCubit>(create: (context) => LoginCubit()..checkLoginStatus()),
         BlocProvider<RegisterCubit>(create: (context) => RegisterCubit()),
+        BlocProvider<TimeCubit>(create: (context) => TimeCubit()),
       ],
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           fontFamily: AppTextStyles.fontFamily,
           scaffoldBackgroundColor: AppColors.scaffoldBackground,
-          useMaterial3: true, // <-- هذا السطر يُفعل Material 3
+          useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: AppColors.yellow),
         ),
-        home: const ChooseUserView(),
+        initialRoute: '/',
         getPages: [
+          GetPage(name: '/', page: () => const ChooseUserView()),
           GetPage(name: '/login', page: () => const LoginView()),
           GetPage(name: '/registerParent', page: () => const RegisterView()),
-          GetPage(name: '/registerKid', page: () =>  AddKidSplachView()),
+          GetPage(name: '/registerKid', page: () => AddKidSplachView()),
           GetPage(name: '/home', page: () => HomeView()),
-          GetPage(name: '/add_kid', page: () =>  AddKidSplachView()),
+          GetPage(name: '/add_kid', page: () => AddKidSplachView()),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidscare/core/helper/my_navigator.dart';
 import 'package:kidscare/core/widget/custom_text_form.dart';
 import 'package:kidscare/core/widget/custom_elvated_btn.dart';
 import 'package:kidscare/core/helper/my_validator.dart';
@@ -7,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:kidscare/core/services/kids_service.dart';
+import 'package:kidscare/features/auth/views/login_view.dart';
 
 class EditProfileView extends StatefulWidget {
   const EditProfileView({super.key});
@@ -130,7 +132,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                           height: buttonHeight,
                           child: CustomElevatedButton(
                             textButton: 'Cancel',
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () => MyNavigator.goTo(screen: LoginView()),
                             backgroundColor: const Color(0xFFFFC107),
                             foregroundColor: Colors.black,
                             shadowColor: const Color(0xFFFFC107),

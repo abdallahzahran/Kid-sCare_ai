@@ -5,6 +5,7 @@ import 'package:kidscare/features/home/widgets/custom_user_card.dart';
 import 'package:kidscare/features/profile/views/profile.dart';
 import 'package:kidscare/features/splash/views/add_kid.dart';
 import 'package:kidscare/features/dashboard/views/dashboard_view.dart';
+import 'package:kidscare/core/utils/app_assets.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -64,8 +65,26 @@ class _HomeViewState extends State<HomeView> {
   }
 }
 
-class HomeTab extends StatelessWidget {
+class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
+
+  @override
+  State<HomeTab> createState() => _HomeTabState();
+}
+
+class _HomeTabState extends State<HomeTab> {
+  final List<Kid> kids = [
+    Kid(name: 'ALi Mohmed', avatarAsset: AppAssets.image),
+    Kid(name: 'Abdallah Mohmed', avatarAsset: AppAssets.image),
+    Kid(name: 'Hassan Mohmed', avatarAsset: AppAssets.image),
+  ];
+  int selectedKid = 0;
+
+  void switchKid(int index) {
+    setState(() {
+      selectedKid = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,12 +107,56 @@ class HomeTab extends StatelessWidget {
                     ),
                   ),
                 ),
-                CustomUserCard(),
-                
+                CustomUserCard(
+                  kid: kids[selectedKid],
+                  onSwitchKid: () => showModalBottomSheet(
+                    context: context,
+                    builder: (_) => SwitchKidSheet(
+                      kids: kids,
+                      selected: selectedKid,
+                      onSelect: (i) {
+                        switchKid(i);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
         ),
+      ],
+    );
+  }
+}
+
+class Kid {
+  final String name;
+  final String avatarAsset;
+  Kid({required this.name, required this.avatarAsset});
+}
+
+class SwitchKidSheet extends StatelessWidget {
+  final List<Kid> kids;
+  final int selected;
+  final ValueChanged<int> onSelect;
+  const SwitchKidSheet({super.key, required this.kids, required this.selected, required this.onSelect});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 16),
+        const Text('Switch Kids', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        const Divider(),
+        ...List.generate(kids.length, (i) => ListTile(
+          leading: CircleAvatar(backgroundImage: AssetImage(kids[i].avatarAsset)),
+          title: Text(kids[i].name),
+          selected: i == selected,
+          onTap: () => onSelect(i),
+        )),
+        const SizedBox(height: 16),
       ],
     );
   }

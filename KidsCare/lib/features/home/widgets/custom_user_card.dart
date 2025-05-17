@@ -10,9 +10,13 @@ import '../../auth/views/login_view.dart';
 import '../../time/views/bounus_time.dart';
 import '../../time/views/set_time_view.dart';
 import 'custom_action_btn.dart';
+import '../../home/views/home_view.dart';
 
 class CustomUserCard extends StatelessWidget {
-  const CustomUserCard({super.key});
+  final Kid kid;
+  final VoidCallback onSwitchKid;
+
+  const CustomUserCard({super.key, required this.kid, required this.onSwitchKid});
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +36,11 @@ class CustomUserCard extends StatelessWidget {
                   margin: EdgeInsetsDirectional.only(end: 16),
                   height: MyResponsive.height(context, value: 60),
                   width: MyResponsive.height(context, value: 60),
-                  // child:  Image.asset(AppAssets.image,),
                   decoration: BoxDecoration(
                     color: AppColors.blue,
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: AssetImage(AppAssets.image),
+                      image: AssetImage(kid.avatarAsset),
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -48,7 +51,7 @@ class CustomUserCard extends StatelessWidget {
               ),
               SizedBox(width: 12),
               Text(
-                'ALi Mohmed',
+                kid.name,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -57,16 +60,13 @@ class CustomUserCard extends StatelessWidget {
               ),
               Spacer(),
               RegisterKidView(),
-
               CustomActionBottom(
                 icon: CustomSvg(assetPath: AppAssets.switchKid),
-                onPressed: () {},
+                onPressed: onSwitchKid,
               ),
             ],
           ),
-
           SizedBox(height: 20),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -76,7 +76,6 @@ class CustomUserCard extends StatelessWidget {
                 onPressed: () async {
                   final minutes = await BounusTimeView.showBounusTime(context);
                   if (minutes != null) {
-                    // TODO: Handle the bonus time minutes
                     print('Bonus time: $minutes minutes');
                   }
                 },
@@ -89,7 +88,6 @@ class CustomUserCard extends StatelessWidget {
                 icon: CustomSvg(assetPath: AppAssets.calls),
                 onPressed: () {},
               ),
-
               ElevatedButton(
                 onPressed: (){},
                 style: ElevatedButton.styleFrom(
@@ -102,7 +100,7 @@ class CustomUserCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                     horizontal: 37.0,
                     vertical: 10.0,
-                  ), // التحكم بالحجم من هنا
+                  ),
                 ),
                 child: Text('Lock',
                   textAlign: TextAlign.center,

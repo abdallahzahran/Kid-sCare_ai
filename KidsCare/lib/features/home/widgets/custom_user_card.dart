@@ -69,7 +69,16 @@ class CustomUserCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               SetTimeView(),
-              BounsTimeView(),
+              CustomActionBottom(
+                icon: CustomSvg(assetPath: AppAssets.bouns),
+                onPressed: () async {
+                  final minutes = await BounusTimeView.showBounusTime(context);
+                  if (minutes != null) {
+                    // TODO: Handle the bonus time minutes
+                    print('Bonus time: $minutes minutes');
+                  }
+                },
+              ),
               CustomActionBottom(
                 icon: CustomSvg(assetPath: AppAssets.app),
                 onPressed: () {},

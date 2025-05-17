@@ -1,0 +1,139 @@
+import 'package:flutter/material.dart';
+import 'package:kidscare/core/utils/app_colors.dart';
+
+class KidsInfoView extends StatefulWidget {
+  const KidsInfoView({super.key});
+
+  @override
+  State<KidsInfoView> createState() => _KidsInfoViewState();
+}
+
+class _KidsInfoViewState extends State<KidsInfoView> {
+  List<Map<String, String>> kids = [
+    {'name': 'ALi Mohmed', 'email': 'Mohamed_sayed@gmail.com'},
+    {'name': 'ALi Mohmed', 'email': 'Mohamed_sayed@gmail.com'},
+    {'name': 'ALi Mohmed', 'email': 'Mohamed_sayed@gmail.com'},
+  ];
+
+  void _showKidDialog({Map<String, String>? kid, int? index}) {
+    final nameController = TextEditingController(text: kid?['name'] ?? '');
+    final emailController = TextEditingController(text: kid?['email'] ?? '');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(kid == null ? 'Add Kid' : 'Edit Kid'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Name'),
+            ),
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newKid = {
+                'name': nameController.text,
+                'email': emailController.text,
+              };
+              setState(() {
+                if (kid == null) {
+                  kids.add(newKid);
+                } else if (index != null) {
+                  kids[index] = newKid;
+                }
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Kids Info'),
+        centerTitle: true,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showKidDialog(),
+        child: const Icon(Icons.add),
+        shape: CircleBorder(),
+        backgroundColor: AppColors.yellow,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Kids info', style: TextStyle(fontSize: 16)),
+            const SizedBox(height: 12),
+            ...kids.asMap().entries.map((entry) {
+              final kid = entry.value;
+              final idx = entry.key;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Material(
+                  elevation: 2,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: const BoxDecoration(
+                            color: AppColors.yellow,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(kid['name']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              Text(kid['email']!, style: const TextStyle(color: Colors.grey)),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color:AppColors.grayDark2),
+                          onPressed: () => _showKidDialog(kid: kid, index: idx),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+} 

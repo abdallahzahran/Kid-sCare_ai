@@ -4,6 +4,7 @@ import 'package:kidscare/features/home/widgets/custom_app_bar.dart';
 import 'package:kidscare/features/home/widgets/custom_user_card.dart';
 import 'package:kidscare/features/profile/views/profile.dart';
 import 'package:kidscare/features/splash/views/add_kid.dart';
+import 'package:kidscare/features/dashboard/views/dashboard_view.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -16,7 +17,7 @@ class _HomeViewState extends State<HomeView> {
   final List<Widget> _pages = [
     HomeTab(),
     ProfileView(),
-   // Center(child: Text('Business Page', style: TextStyle(fontSize: 22))),
+    DashboardView(),
     Center(child: Text('School Page', style: TextStyle(fontSize: 22))),
   ];
 
@@ -84,18 +85,7 @@ class HomeTab extends StatelessWidget {
                   ),
                 ),
                 CustomUserCard(),
-                // يمكنك تفعيل هذه الأقسام لاحقاً
-                // LocationSection(),
-                // ActionButton(
-                //   icon: Icons.category_outlined,
-                //   label: 'Classify content',
-                // ),
-                // SizedBox(height: 12),
-                // ActionButton(
-                //   icon: Icons.devices_outlined,
-                //   label: 'Live Display',
-                // ),
-                // SizedBox(height: 60),
+                
               ],
             ),
           ),

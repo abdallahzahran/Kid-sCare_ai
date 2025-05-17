@@ -3,10 +3,12 @@ import 'package:kidscare/features/auth/views/login_view.dart';
 import 'package:kidscare/features/auth/views/register_view.dart';
 import 'package:kidscare/features/home/views/home_view.dart';
 import '../../../core/helper/my_navigator.dart';
-import '../../../core/helper/my_responsive.dart';
 import '../../../core/utils/app_assets.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../core/widget/custom_card_profile.dart';
+import 'edit_profile_view.dart';
+import '../../time/views/bounus_time.dart';
+import 'kids_info_view.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -21,9 +23,9 @@ class ProfileView extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  margin: EdgeInsetsDirectional.only(end: 16),
-                  height: MyResponsive.height(context, value: 60),
-                  width: MyResponsive.height(context, value: 60),
+                  margin: const EdgeInsetsDirectional.only(end: 16),
+                  height: 60,
+                  width: 60,
                   decoration: BoxDecoration(
                     color: AppColors.blue,
                     shape: BoxShape.circle,
@@ -33,19 +35,18 @@ class ProfileView extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(width: MediaQuery.of(context).size.height * 0.02),
+                const SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Hello!',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w300,
                       ),
                     ),
-
-                    Text(
+                    const Text(
                       'Abdallah Zahran',
                       style: TextStyle(
                         fontSize: 16,
@@ -57,8 +58,7 @@ class ProfileView extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.04),
-
+            const SizedBox(height: 36),
             InkWell(
               child: CustomCardProfile(
                 iconPath: AppAssets.user,
@@ -67,11 +67,11 @@ class ProfileView extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HomeView()),
+                  MaterialPageRoute(builder: (context) => const EditProfileView()),
                 );
               },
             ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+            const SizedBox(height: 16),
             InkWell(
               child: CustomCardProfile(
                 iconPath: AppAssets.kid,
@@ -80,11 +80,25 @@ class ProfileView extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HomeView()),
+                  MaterialPageRoute(builder: (context) => KidsInfoView()),
                 );
               },
             ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+            const SizedBox(height: 16),
+            InkWell(
+              child: CustomCardProfile(
+                iconPath: AppAssets.time,
+                text: 'Give bouns',
+              ),
+              onTap: () async {
+                final minutes = await BounusTimeView.showBounusTime(context);
+                if (minutes != null) {
+                  // TODO: Handle the bonus time minutes
+                  print('Bonus time: $minutes minutes');
+                }
+              },
+            ),
+            const SizedBox(height: 16),
             InkWell(
               child: CustomCardProfile(
                 iconPath: AppAssets.settings,
@@ -97,7 +111,7 @@ class ProfileView extends StatelessWidget {
                 );
               },
             ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+            const SizedBox(height: 16),
             InkWell(
               child: CustomCardProfile(
                 iconPath: AppAssets.logOut,
@@ -107,7 +121,6 @@ class ProfileView extends StatelessWidget {
                 MyNavigator.goTo(
                   screen: () => LoginView(),
                   isReplace: true,
-
                 );
               },
             ),
@@ -116,4 +129,4 @@ class ProfileView extends StatelessWidget {
       ),
     );
   }
-}
+} 

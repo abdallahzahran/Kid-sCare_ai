@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kidscare/core/utils/app_assets.dart';
 import 'package:kidscare/core/widget/custom_svg.dart';
+import 'package:kidscare/features/notification/views/notification_view.dart';
 
 import '../../../core/utils/app_colors.dart';
 
@@ -28,7 +29,15 @@ class CustomAppBar extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.22,
           ),
           Spacer(),
-          CustomSvg(assetPath: AppAssets.notification),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NotificationView()),
+              );
+            },
+            child: CustomSvg(assetPath: AppAssets.notification),
+          ),
         ],
       ),
     );

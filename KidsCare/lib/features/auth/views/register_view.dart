@@ -15,12 +15,20 @@ import '../../../core/utils/app_constants.dart';
 import '../../../core/utils/app_text_styles.dart';
 import '../manager/register_cubit/register_cubit.dart';
 import '../manager/register_cubit/register_state.dart';
+import '../../../core/helper/my_responsive.dart';
 
 class RegisterView extends StatelessWidget {
   const RegisterView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final double verticalSpacing = MyResponsive.height(context, value: 24);
+    final double fieldSpacing = MyResponsive.height(context, value: 20);
+    final double buttonSpacing = MyResponsive.height(context, value: 32);
+    final double logoSpacing = MyResponsive.height(context, value: 30);
+    final double registerSpacing = MyResponsive.height(context, value: 40);
+    final double maxFormWidth = MyResponsive.width(context, value: 350);
+
     return Scaffold(
       body: BlocProvider(
         create: (BuildContext context) => RegisterCubit(),
@@ -41,9 +49,7 @@ class RegisterView extends StatelessWidget {
                   );
                   MyNavigator.goTo(
                     screen: () => AddKidSplachView(),
-
                   );
-
                 }
               },
               builder: (context, state) {
@@ -52,92 +58,92 @@ class RegisterView extends StatelessWidget {
                   key: cubit.formKey,
                   child: Center(
                     child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          AppConstants.sizedBoxHeight(context, 0.02),
-                          CustomSvg(assetPath: AppAssets.logo),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01,
-                          ),
-                          CustomTextFormField(
-                            label: 'Username',
-                            textStyle: AppTextStyles.first,
-                            prefixIconPath: AppAssets.user,
-                            controller: cubit.usernameController,
-                            validator: RequiredValidator(),
-                          ),
-                          CustomTextFormField(
-                            label: 'Email',
-                            textStyle: AppTextStyles.first,
-                            prefixIconPath: AppAssets.user,
-                            controller: cubit.emailController,
-                            validator: EmailValidator(),
-                          ),
-                          CustomTextFormField(
-                            label: 'Password',
-                            textStyle: AppTextStyles.first,
-                            prefixIconPath: AppAssets.password,
-                            suffixIconPath:
-                            cubit.isPasswordVisible
-                                ? AppAssets.passwordEnable
-                                : AppAssets.passwordDisable,
-                            obscureText: !cubit.isPasswordVisible,
-                            controller: cubit.passwordController,
-                            validator: PasswordValidator(),
-                            onSuffixIconTap: () {
-                              cubit.togglePasswordVisibility();
-                            },
-                          ),
-                          CustomTextFormField(
-                            label: 'Confirm Password',
-                            textStyle: AppTextStyles.first,
-                            prefixIconPath: AppAssets.password,
-                            suffixIconPath:
-                            cubit.isConfirmPasswordVisible
-                                ? AppAssets.passwordEnable
-                                : AppAssets.passwordDisable,
-                            obscureText: !cubit.isConfirmPasswordVisible,
-                            controller: cubit.confirmPasswordController,
-                            validator: PasswordValidator(),
-                            onSuffixIconTap: () {
-                              cubit.toggleConfirmPasswordVisibility();
-                            },
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                          ),
-                          state is RegisterLoadingState
-                              ? const CircularProgressIndicator()
-                              : CustomElevatedButton(
-                            textButton: 'Register',
-                            onPressed: () {
-                              cubit.onRegisterPressed();
-                            },
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.05,
-                          ),
-                          RichText(
-                            text: TextSpan(
-                              text: 'Already have an account?  ',
-                              style: DefaultTextStyle.of(context).style,
-                              children: <TextSpan>[
-                                TextSpan(
-                                  text: 'Login',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.yellow,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Get.offAllNamed('/login');
-                                    },
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: maxFormWidth),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(height: verticalSpacing),
+                              CustomSvg(assetPath: AppAssets.logo),
+                              SizedBox(height: logoSpacing),
+                              CustomTextFormField(
+                                label: 'Username',
+                                textStyle: AppTextStyles.first,
+                                prefixIconPath: AppAssets.user,
+                                controller: cubit.usernameController,
+                                validator: RequiredValidator(),
+                              ),
+                              CustomTextFormField(
+                                label: 'Email',
+                                textStyle: AppTextStyles.first,
+                                prefixIconPath: AppAssets.user,
+                                controller: cubit.emailController,
+                                validator: EmailValidator(),
+                              ),
+                              CustomTextFormField(
+                                label: 'Password',
+                                textStyle: AppTextStyles.first,
+                                prefixIconPath: AppAssets.password,
+                                suffixIconPath:
+                                cubit.isPasswordVisible
+                                    ? AppAssets.passwordEnable
+                                    : AppAssets.passwordDisable,
+                                obscureText: !cubit.isPasswordVisible,
+                                controller: cubit.passwordController,
+                                validator: PasswordValidator(),
+                                onSuffixIconTap: () {
+                                  cubit.togglePasswordVisibility();
+                                },
+                              ),
+                              CustomTextFormField(
+                                label: 'Confirm Password',
+                                textStyle: AppTextStyles.first,
+                                prefixIconPath: AppAssets.password,
+                                suffixIconPath:
+                                cubit.isConfirmPasswordVisible
+                                    ? AppAssets.passwordEnable
+                                    : AppAssets.passwordDisable,
+                                obscureText: !cubit.isConfirmPasswordVisible,
+                                controller: cubit.confirmPasswordController,
+                                validator: PasswordValidator(),
+                                onSuffixIconTap: () {
+                                  cubit.toggleConfirmPasswordVisibility();
+                                },
+                              ),
+                              SizedBox(height: fieldSpacing),
+                              state is RegisterLoadingState
+                                  ? const CircularProgressIndicator()
+                                  : CustomElevatedButton(
+                                textButton: 'Register',
+                                onPressed: () {
+                                  cubit.onRegisterPressed();
+                                },
+                              ),
+                              SizedBox(height: buttonSpacing),
+                              RichText(
+                                text: TextSpan(
+                                  text: 'Already have an account?  ',
+                                  style: DefaultTextStyle.of(context).style,
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: 'Login',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.yellow,
+                                      ),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          Get.offAllNamed('/login');
+                                        },
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              SizedBox(height: registerSpacing),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),

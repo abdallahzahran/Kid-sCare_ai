@@ -33,7 +33,7 @@ class CustomCardProfile extends StatelessWidget {
               children: [
                 SvgPicture.asset(iconPath),
                SizedBox(width: 10,),
-                Text('$text'),
+                Text(text),
                 Spacer(),
                 SvgPicture.asset(AppAssets.arrowBackRight),
               ]

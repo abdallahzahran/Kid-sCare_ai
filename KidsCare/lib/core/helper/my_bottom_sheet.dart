@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kidscare/core/helper/my_responsive.dart';
 
 import '../utils/app_colors.dart';
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:kidscare/core/cache/cache_helper.dart';
 import 'package:kidscare/core/utils/app_colors.dart';
 import 'package:kidscare/core/utils/app_text_styles.dart';

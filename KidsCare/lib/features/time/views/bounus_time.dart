@@ -19,7 +19,7 @@ class BounusTimeView extends StatefulWidget {
   }
 
   // Private constructor for callback
-  const BounusTimeView._withResult(this.onDone, {Key? key}) : super(key: key);
+  const BounusTimeView._withResult(this.onDone, {super.key});
 
   final void Function(int minutes)? onDone;
 

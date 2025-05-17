@@ -11,7 +11,6 @@ import 'package:kidscare/features/auth/views/login_view.dart';
 import 'package:kidscare/features/splash/views/add_kid.dart';
 import '../../../core/helper/my_navigator.dart';
 import '../../../core/helper/my_validator.dart';
-import '../../../core/utils/app_constants.dart';
 import '../../../core/utils/app_text_styles.dart';
 import '../manager/register_cubit/register_cubit.dart';
 import '../manager/register_cubit/register_state.dart';

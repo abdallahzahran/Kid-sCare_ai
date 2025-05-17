@@ -12,6 +12,8 @@ import '../../time/views/set_time_view.dart';
 import 'custom_action_btn.dart';
 
 class CustomUserCard extends StatelessWidget {
+  const CustomUserCard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(

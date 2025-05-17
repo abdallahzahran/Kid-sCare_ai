@@ -76,9 +76,9 @@ class _KidsInfoViewState extends State<KidsInfoView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showKidDialog(),
-        child: const Icon(Icons.add),
         shape: CircleBorder(),
         backgroundColor: AppColors.yellow,
+        child: const Icon(Icons.add),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),

@@ -7,6 +7,8 @@ import 'package:kidscare/features/splash/views/add_kid.dart';
 import 'package:kidscare/features/dashboard/views/dashboard_view.dart';
 
 class HomeView extends StatefulWidget {
+  const HomeView({super.key});
+
   @override
   State<HomeView> createState() => _HomeViewState();
 }
@@ -63,6 +65,8 @@ class _HomeViewState extends State<HomeView> {
 }
 
 class HomeTab extends StatelessWidget {
+  const HomeTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(

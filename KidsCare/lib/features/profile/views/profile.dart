@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kidscare/features/auth/views/login_view.dart';
-import 'package:kidscare/features/auth/views/register_view.dart';
 import 'package:kidscare/features/home/views/home_view.dart';
 import '../../../core/helper/my_navigator.dart';
 import '../../../core/utils/app_assets.dart';

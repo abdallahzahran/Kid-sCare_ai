@@ -15,7 +15,7 @@ class CustomTextFormField extends StatelessWidget {
   final double? horizontalPadding;
 
   const CustomTextFormField({
-    Key? key,
+    super.key,
     required this.label,
     this.obscureText = false,
     this.prefixIconPath,
@@ -24,7 +24,7 @@ class CustomTextFormField extends StatelessWidget {
     required this.validator,
     this.onSuffixIconTap,
     required this.textStyle,this.horizontalPadding,
-  }) : super(key: key);
+  });
 
   Widget _buildIcon(String path) {
     return Padding(

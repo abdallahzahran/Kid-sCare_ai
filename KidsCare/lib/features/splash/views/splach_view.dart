@@ -7,6 +7,8 @@ import '../manager/splach_cubit/splach_cubit.dart';
 import '../manager/splach_cubit/splach_state.dart';
 
 class SplashView extends StatelessWidget {
+  const SplashView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(

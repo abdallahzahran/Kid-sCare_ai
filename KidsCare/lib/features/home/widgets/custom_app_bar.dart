@@ -6,6 +6,8 @@ import 'package:kidscare/features/notification/views/notification_view.dart';
 import '../../../core/utils/app_colors.dart';
 
 class CustomAppBar extends StatelessWidget {
+  const CustomAppBar({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(

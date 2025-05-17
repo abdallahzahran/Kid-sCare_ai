@@ -9,7 +9,6 @@ import 'package:kidscare/core/widget/custom_elvated_btn.dart';
 import 'package:kidscare/core/widget/custom_svg.dart';
 import 'package:kidscare/core/widget/custom_text_form.dart';
 import 'package:kidscare/features/auth/views/register_view.dart';
-import '../../../core/utils/app_constants.dart';
 import '../../home/views/home_view.dart';
 import '../manager/login_cubit/login_cubit.dart';
 import '../manager/login_cubit/login_state.dart';

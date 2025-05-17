@@ -97,37 +97,35 @@ class _HomeTabState extends State<HomeTab> {
       children: [
         CustomAppBar(),
         Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Welcome to App',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.blue,
-                    ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Welcome to App',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.blue,
                   ),
                 ),
-                CustomUserCard(
-                  kid: kids[selectedKid],
-                  onSwitchKid: () => showModalBottomSheet(
-                    context: context,
-                    builder: (_) => SwitchKidSheet(
-                      kids: kids,
-                      selected: selectedKid,
-                      onSelect: (i) {
-                        switchKid(i);
-                        Navigator.pop(context);
-                      },
-                    ),
+              ),
+              CustomUserCard(
+                kid: kids[selectedKid],
+                onSwitchKid: () => showModalBottomSheet(
+                  context: context,
+                  builder: (_) => SwitchKidSheet(
+                    kids: kids,
+                    selected: selectedKid,
+                    onSelect: (i) {
+                      switchKid(i);
+                      Navigator.pop(context);
+                    },
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],
@@ -145,23 +143,37 @@ class SwitchKidSheet extends StatelessWidget {
   final List<Kid> kids;
   final int selected;
   final ValueChanged<int> onSelect;
-  const SwitchKidSheet({super.key, required this.kids, required this.selected, required this.onSelect});
+
+  const SwitchKidSheet({
+    super.key,
+    required this.kids,
+    required this.selected,
+    required this.onSelect,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const SizedBox(height: 16),
-        const Text('Switch Kids', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        const Divider(),
-        ...List.generate(kids.length, (i) => ListTile(
-          title: Text(kids[i].name),
-          selected: i == selected,
-          onTap: () => onSelect(i),
-        )),
-        const SizedBox(height: 16),
-      ],
+    return SizedBox(
+      height: 400,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 16),
+          const Text('Switch Kids', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          const Divider(),
+          Expanded(
+            child: ListView.builder(
+              itemCount: kids.length,
+              itemBuilder: (context, i) => ListTile(
+                title: Text(kids[i].name),
+                selected: i == selected,
+                onTap: () => onSelect(i),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 }

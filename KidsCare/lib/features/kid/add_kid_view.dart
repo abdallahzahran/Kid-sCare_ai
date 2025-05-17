@@ -11,9 +11,15 @@ import '../../core/utils/app_text_styles.dart';
 import '../../core/widget/custom_elvated_btn.dart';
 import '../../core/widget/custom_svg.dart';
 import '../auth/views/login_view.dart';
+import 'package:kidscare/core/services/kids_service.dart';
 
 class RegisterKidView extends StatelessWidget {
-  const RegisterKidView({super.key});
+  RegisterKidView({super.key});
+
+  final nameController = TextEditingController();
+  final ageController = TextEditingController();
+  final emailController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -25,100 +31,79 @@ class RegisterKidView extends StatelessWidget {
           height: MyResponsive.height(context, value: 600),
           child: Padding(
             padding: const EdgeInsets.all(8),
-            child: Column(
-              children: [
-                const Center(
-                  child: Text(
-                    'Add Kid',
-                    style: TextStyle(fontSize: 25, color: AppColors.yellowLight),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  const Center(
+                    child: Text(
+                      'Add Kid',
+                      style: TextStyle(fontSize: 25, color: AppColors.yellowLight),
+                    ),
                   ),
-                ),
-                const Divider(thickness: 0.2,),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-
-                // صورة الطفل مع زرار الكاميرا
-                Stack(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        MyNavigator.goTo(screen: LoginView());
-                      },
-                      child: Container(
-                       // margin: const EdgeInsetsDirectional.only(end: 16),
-                        height: MyResponsive.height(context, value: 120),
-                        width: MyResponsive.height(context, value: 120),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: AssetImage(AppAssets.image),
-                            fit: BoxFit.cover,
+                  const Divider(thickness: 0.2,),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                  CustomTextFormField(
+                    controller: nameController,
+                    label: 'Child Name',
+                    textStyle: AppTextStyles.second,
+                    horizontalPadding: 0,
+                    validator: RequiredValidator(),
+                  ),
+                  CustomTextFormField(
+                    controller: ageController,
+                    label: 'Age',
+                    textStyle: AppTextStyles.second,
+                    horizontalPadding: 0,
+                    validator: PositiveIntegerValidator(),
+                  ),
+                  CustomTextFormField(
+                    controller: emailController,
+                    label: 'Email',
+                    textStyle: AppTextStyles.second,
+                    horizontalPadding: 0,
+                    validator: EmailValidator(),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  CustomElevatedButton(
+                    textButton: 'Done',
+                    shadowColor: AppColors.yellowLight,
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        KidsService().addKid({
+                          'name': nameController.text,
+                          'email': emailController.text,
+                          'age': ageController.text,
+                        });
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('The child has been added successfully',style: TextStyle(color: AppColors.blue),),
+                            backgroundColor: AppColors.yellow,
                           ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.yellow,
-                          shape: BoxShape.circle,
-                        ),
-                        child: CustomSvg(assetPath: AppAssets.user),
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-
-                // الفورمز
-                CustomTextFormField(
-                  label: 'Child Name',
-                  textStyle: AppTextStyles.second,
-                  horizontalPadding: 0,
-                  // prefixIconPath: AppAssets.user,
-                  validator: RequiredValidator(),
-                ),
-                CustomTextFormField(
-                  label: 'Age',
-                  textStyle: AppTextStyles.second,
-                  horizontalPadding: 0,
-                  // prefixIconPath: AppAssets.user,
-                  validator: RequiredValidator(),
-                ),
-                CustomTextFormField(
-                  label: 'Email',
-                  textStyle: AppTextStyles.second,
-                 horizontalPadding: 0,
-                 // prefixIconPath: AppAssets.user,
-                  validator: EmailValidator(),
-                ),
-
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-
-                CustomElevatedButton(
-                  textButton: 'Done',
-                  shadowColor: AppColors.yellowLight,
-                  onPressed: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('The child has been added successfully',style: TextStyle(color: AppColors.blue),),
-                        backgroundColor: AppColors.yellow,
-                      ),
-                    );
-                  },
-                  backgroundColor: AppColors.yellowLight,
-                  foregroundColor: AppColors.blue,
-                ),
-              ],
+                        );
+                      }
+                    },
+                    backgroundColor: AppColors.yellowLight,
+                    foregroundColor: AppColors.blue,
+                  ),
+                ],
+              ),
             ),
           ),
         );
       },
     );
+  }
+}
+
+class PositiveIntegerValidator extends AppValidator {
+  @override
+  String? validate(String? value) {
+    if (value == null || value.isEmpty) return 'Age is required';
+    final age = int.tryParse(value);
+    if (age == null) return 'Enter a valid age';
+    if (age <= 0) return 'Enter a positive age';
+    return null;
   }
 }

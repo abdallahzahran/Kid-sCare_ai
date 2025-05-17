@@ -7,9 +7,13 @@ import 'package:kidscare/core/widget/custom_text_form.dart';
 import '../../../core/helper/my_validator.dart';
 import '../../../core/utils/app_text_styles.dart';
 import '../../../core/helper/my_responsive.dart';
+import 'package:kidscare/core/services/kids_service.dart';
 
 class AddKidSplachView extends StatelessWidget {
-  const AddKidSplachView({super.key});
+  AddKidSplachView({super.key});
+
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +36,7 @@ class AddKidSplachView extends StatelessWidget {
                 ),
                 SizedBox(height: verticalSpacing),
                 CustomTextFormField(
+                  controller: nameController,
                   label: 'Name',
                   textStyle: AppTextStyles.first,
                   prefixIconPath: AppAssets.user,
@@ -39,6 +44,7 @@ class AddKidSplachView extends StatelessWidget {
                 ),
                 SizedBox(height: fieldSpacing),
                 CustomTextFormField(
+                  controller: emailController,
                   label: 'Email',
                   textStyle: AppTextStyles.first,
                   prefixIconPath: AppAssets.user,
@@ -48,10 +54,11 @@ class AddKidSplachView extends StatelessWidget {
                 CustomElevatedButton(
                   textButton: 'Done',
                   onPressed: () {
-                    // هنا ممكن تعمل حفظ لبيانات الطفل اللي تم إدخالها
-                    // ...
-
-                    Get.offAllNamed('/login'); // الانتقال لصفحة اللوجين باستخدام Get.offAllNamed
+                    KidsService().addKid({
+                      'name': nameController.text,
+                      'email': emailController.text,
+                    });
+                    Get.offAllNamed('/login');
                   },
                 ),
               ],

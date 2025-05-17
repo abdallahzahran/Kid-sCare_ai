@@ -12,25 +12,68 @@ class KidsInfoView extends StatefulWidget {
 class _KidsInfoViewState extends State<KidsInfoView> {
   List<Map<String, String>> get kids => KidsService().kids;
 
+  void _showDeleteConfirmation(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Kid'),
+        content: const Text('Are you sure you want to delete this kid?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                KidsService().deleteKid(index);
+              });
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Kid deleted successfully'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showKidDialog({Map<String, String>? kid, int? index}) {
     final nameController = TextEditingController(text: kid?['name'] ?? '');
     final emailController = TextEditingController(text: kid?['email'] ?? '');
+    final _formKey = GlobalKey<FormState>();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(kid == null ? 'Add Kid' : 'Edit Kid'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-            ),
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-          ],
+        content: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+                validator: (value) => value == null || value.isEmpty ? 'Name is required' : null,
+              ),
+              TextFormField(
+                controller: emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Email is required';
+                  final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                  if (!emailRegex.hasMatch(value)) return 'Enter a valid email';
+                  return null;
+                },
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -39,18 +82,20 @@ class _KidsInfoViewState extends State<KidsInfoView> {
           ),
           ElevatedButton(
             onPressed: () {
-              final newKid = {
-                'name': nameController.text,
-                'email': emailController.text,
-              };
-              setState(() {
-                if (kid == null) {
-                  KidsService().addKid(newKid);
-                } else if (index != null) {
-                  KidsService().updateKid(index, newKid);
-                }
-              });
-              Navigator.pop(context);
+              if (_formKey.currentState!.validate()) {
+                final newKid = {
+                  'name': nameController.text,
+                  'email': emailController.text,
+                };
+                setState(() {
+                  if (kid == null) {
+                    KidsService().addKid(newKid);
+                  } else if (index != null) {
+                    KidsService().updateKid(index, newKid);
+                  }
+                });
+                Navigator.pop(context);
+              }
             },
             child: const Text('Save'),
           ),
@@ -111,8 +156,12 @@ class _KidsInfoViewState extends State<KidsInfoView> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.edit, color:AppColors.grayDark2),
+                          icon: const Icon(Icons.edit, color: AppColors.grayDark2),
                           onPressed: () => _showKidDialog(kid: kid, index: idx),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _showDeleteConfirmation(idx),
                         ),
                       ],
                     ),

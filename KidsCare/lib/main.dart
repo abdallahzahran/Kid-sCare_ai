@@ -47,9 +47,9 @@ class KidsCareApp extends StatelessWidget {
         getPages: [
           GetPage(name: '/login', page: () => const LoginView()),
           GetPage(name: '/registerParent', page: () => const RegisterView()),
-          GetPage(name: '/registerKid', page: () => const AddKidSplachView()),
+          GetPage(name: '/registerKid', page: () =>  AddKidSplachView()),
           GetPage(name: '/home', page: () => HomeView()),
-          GetPage(name: '/add_kid', page: () => const AddKidSplachView()),
+          GetPage(name: '/add_kid', page: () =>  AddKidSplachView()),
         ],
       ),
     );

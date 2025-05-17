@@ -18,4 +18,10 @@ class KidsService {
   void updateKid(int index, Map<String, String> kid) {
     _kids[index] = kid;
   }
+
+  void deleteKid(int index) {
+    if (index >= 0 && index < _kids.length) {
+      _kids.removeAt(index);
+    }
+  }
 } 

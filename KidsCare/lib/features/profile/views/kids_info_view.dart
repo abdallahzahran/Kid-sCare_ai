@@ -10,7 +10,7 @@ class KidsInfoView extends StatefulWidget {
 }
 
 class _KidsInfoViewState extends State<KidsInfoView> {
-  List<Map<String, dynamic>> get kids => KidsService().kids;
+  List<Map<String, String>> get kids => KidsService().kids;
 
   void _showDeleteConfirmation(int index) {
     // Check if trying to delete first kid
@@ -37,7 +37,7 @@ class _KidsInfoViewState extends State<KidsInfoView> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                KidsService().removeKid(index);
+                KidsService().deleteKid(index);
               });
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -55,7 +55,7 @@ class _KidsInfoViewState extends State<KidsInfoView> {
     );
   }
 
-  void _showKidDialog({Map<String, dynamic>? kid, int? index}) {
+  void _showKidDialog({Map<String, String>? kid, int? index}) {
     final nameController = TextEditingController(text: kid?['name'] ?? '');
     final emailController = TextEditingController(text: kid?['email'] ?? '');
     final ageController = TextEditingController(text: kid?['age'] ?? '');

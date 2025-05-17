@@ -4,8 +4,6 @@ import '../../data/models/register_model.dart';
 import '../../data/repo/auth_repo.dart';
 import 'register_state.dart';
 import '../../../../core/services/kids_service.dart';
-import '../../../../core/cache/cache_helper.dart';
-import '../../../../core/services/navigation_service.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
   final AuthRepo _authRepo = AuthRepo();
@@ -51,18 +49,10 @@ class RegisterCubit extends Cubit<RegisterState> {
         final response = await _authRepo.register(registerModel);
         
         if (response['status_code'] == 200 || response['status_code'] == 201) {
-          // Save user session
-          await CacheHelper.saveUserSession(
-            email: emailController.text,
-            username: usernameController.text,
-            isLoggedIn: true,
-          );
-          
           // Save parent name
-          await KidsService().setParentName(usernameController.text);
+          KidsService().setParentName(usernameController.text);
           
           emit(RegisterSuccessState(RegisterModel.fromJson(response)));
-          NavigationService.toAddKid();
         } else {
           emit(RegisterErrorState(response['message'] ?? 'Registration failed'));
         }

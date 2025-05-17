@@ -2,21 +2,19 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
-import 'package:kidscare/core/cache/cache_helper.dart';
-import 'package:kidscare/core/helper/my_navigator.dart';
-import 'package:kidscare/core/helper/my_validator.dart';
-import 'package:kidscare/core/services/navigation_service.dart';
 import 'package:kidscare/core/utils/app_assets.dart';
 import 'package:kidscare/core/utils/app_colors.dart';
-import 'package:kidscare/core/utils/app_text_styles.dart';
 import 'package:kidscare/core/widget/custom_elvated_btn.dart';
 import 'package:kidscare/core/widget/custom_svg.dart';
 import 'package:kidscare/core/widget/custom_text_form.dart';
 import 'package:kidscare/features/auth/views/login_view.dart';
 import 'package:kidscare/features/splash/views/add_kid.dart';
-import '../../../core/helper/my_responsive.dart';
+import '../../../core/helper/my_navigator.dart';
+import '../../../core/helper/my_validator.dart';
+import '../../../core/utils/app_text_styles.dart';
 import '../manager/register_cubit/register_cubit.dart';
 import '../manager/register_cubit/register_state.dart';
+import '../../../core/helper/my_responsive.dart';
 
 class RegisterView extends StatelessWidget {
   const RegisterView({super.key});
@@ -146,24 +144,26 @@ class RegisterView extends StatelessWidget {
                                   cubit.onRegisterPressed();
                                 },
                               ),
-                              const SizedBox(height: 16),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Text('Already have an account?'),
-                                  TextButton(
-                                    onPressed: () => Get.toNamed('/login'),
-                                    child: const Text(
-                                      'Login',
-                                      style: TextStyle(
-                                        color: AppColors.yellow,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
                               SizedBox(height: buttonSpacing),
+                              RichText(
+                                text: TextSpan(
+                                  text: 'Already have an account?  ',
+                                  style: DefaultTextStyle.of(context).style,
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: 'Login',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.yellow,
+                                      ),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          Get.offAllNamed('/login');
+                                        },
+                                    ),
+                                  ],
+                                ),
+                              ),
                               SizedBox(height: registerSpacing),
                             ],
                           ),

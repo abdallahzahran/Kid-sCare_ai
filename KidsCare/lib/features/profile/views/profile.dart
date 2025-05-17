@@ -5,15 +5,27 @@ import '../../../core/helper/my_navigator.dart';
 import '../../../core/utils/app_assets.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../core/widget/custom_card_profile.dart';
+import '../../../core/services/kids_service.dart';
 import 'edit_profile_view.dart';
 import '../../time/views/bounus_time.dart';
 import 'kids_info_view.dart';
+import 'dart:io';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
 
   @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  @override
   Widget build(BuildContext context) {
+    final parentName = KidsService().parentName ?? 'Parent';
+    final parentPhotoPath = KidsService().parentPhotoPath;
+    File? parentPhotoFile = parentPhotoPath != null ? File(parentPhotoPath) : null;
+    bool photoExists = parentPhotoFile != null && parentPhotoFile.existsSync();
+    
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -25,14 +37,23 @@ class ProfileView extends StatelessWidget {
                   margin: const EdgeInsetsDirectional.only(end: 16),
                   height: 60,
                   width: 60,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.blue,
                     shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage(AppAssets.image),
-                      fit: BoxFit.cover,
-                    ),
                   ),
+                  child: photoExists
+                      ? ClipOval(child: Image.file(
+                          parentPhotoFile!,
+                          fit: BoxFit.cover,
+                          width: 60,
+                          height: 60,
+                        ))
+                      : ClipOval(child: Image.asset(
+                          AppAssets.image,
+                          fit: BoxFit.cover,
+                          width: 60,
+                          height: 60,
+                        )),
                 ),
                 const SizedBox(width: 16),
                 Column(
@@ -45,9 +66,9 @@ class ProfileView extends StatelessWidget {
                         fontWeight: FontWeight.w300,
                       ),
                     ),
-                    const Text(
-                      'Abdallah Zahran',
-                      style: TextStyle(
+                    Text(
+                      parentName,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w300,
                         color: AppColors.blue,
@@ -63,11 +84,12 @@ class ProfileView extends StatelessWidget {
                 iconPath: AppAssets.user,
                 text: 'Update Profile',
               ),
-              onTap: () {
-                Navigator.push(
+              onTap: () async {
+                final updated = await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const EditProfileView()),
                 );
+                if (updated == true) setState(() {});
               },
             ),
             const SizedBox(height: 16),

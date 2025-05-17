@@ -3,6 +3,10 @@ import 'package:kidscare/core/widget/custom_text_form.dart';
 import 'package:kidscare/core/widget/custom_elvated_btn.dart';
 import 'package:kidscare/core/helper/my_validator.dart';
 import 'package:kidscare/core/helper/my_responsive.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:kidscare/core/services/kids_service.dart';
 
 class EditProfileView extends StatefulWidget {
   const EditProfileView({super.key});
@@ -14,6 +18,22 @@ class EditProfileView extends StatefulWidget {
 class _EditProfileViewState extends State<EditProfileView> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      // Save the image to the app's documents directory
+      final Directory appDir = await getApplicationDocumentsDirectory();
+      final String fileName = DateTime.now().millisecondsSinceEpoch.toString() + '_' + pickedFile.name;
+      final File savedImage = await File(pickedFile.path).copy('${appDir.path}/$fileName');
+      setState(() {
+        _image = savedImage;
+      });
+      // TODO: Save the path to persistent storage if needed
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +65,9 @@ class _EditProfileViewState extends State<EditProfileView> {
                 children: [
                   CircleAvatar(
                     radius: avatarRadius,
-                    backgroundImage: AssetImage('assets/images/profile.png'), // Replace with your asset
+                    backgroundImage: _image != null 
+                        ? FileImage(_image!) 
+                        : const AssetImage('assets/images/profile.png') as ImageProvider,
                   ),
                   Positioned(
                     bottom: 8,
@@ -63,7 +85,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                       ),
                       child: IconButton(
                         icon: const Icon(Icons.camera_alt, color: Colors.black),
-                        onPressed: () {},
+                        onPressed: _pickImage,
                       ),
                     ),
                   ),
@@ -91,7 +113,11 @@ class _EditProfileViewState extends State<EditProfileView> {
                             textButton: 'Apply',
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                // TODO: Save logic
+                                KidsService().setParentName(nameController.text);
+                                if (_image != null) {
+                                  KidsService().setParentPhotoPath(_image!.path);
+                                }
+                                Navigator.pop(context, true); // Indicate update
                               }
                             },
                             backgroundColor: const Color(0xFFFFC107),

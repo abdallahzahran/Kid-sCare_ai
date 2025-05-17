@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:kidscare/core/helper/my_validator.dart';
 import 'package:kidscare/core/utils/app_assets.dart';
 import 'package:kidscare/core/utils/app_colors.dart';
@@ -28,21 +29,23 @@ class LoginView extends StatelessWidget {
 
     return Scaffold(
       body: BlocProvider(
-        create: (_) => LoginCubit(),
+        create: (_) => LoginCubit()..checkLoginStatus(),
         child: BlocConsumer<LoginCubit, LoginState>(
           listener: (context, state) {
             if (state is LoginSuccessState) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Login Successful',style: TextStyle(color: AppColors.blue),),
-                    backgroundColor: AppColors.yellow),
+                SnackBar(
+                  content: Text('Login Successful', style: TextStyle(color: AppColors.blue)),
+                  backgroundColor: AppColors.yellow,
+                ),
               );
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomeView()),
-              );
+              Get.offAllNamed('/home');
             } else if (state is LoginErrorState) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.error)),
+                SnackBar(
+                  content: Text(state.error),
+                  backgroundColor: Colors.red,
+                ),
               );
             }
           },
@@ -70,7 +73,7 @@ class LoginView extends StatelessWidget {
                           ),
                           CustomTextFormField(
                             label: 'Password',
-                            textStyle:AppTextStyles.first ,
+                            textStyle: AppTextStyles.first,
                             prefixIconPath: AppAssets.password,
                             suffixIconPath: cubit.isPasswordVisible
                                 ? AppAssets.passwordEnable
@@ -83,14 +86,16 @@ class LoginView extends StatelessWidget {
                             },
                           ),
                           SizedBox(height: fieldSpacing),
-                          CustomElevatedButton(
-                            textButton: state is LoginLoadingState ? 'Loading...' : 'Login',
-                            onPressed: cubit.onLoginPressed,
-                          ),
+                          state is LoginLoadingState
+                              ? const CircularProgressIndicator()
+                              : CustomElevatedButton(
+                                  textButton: 'Login',
+                                  onPressed: cubit.onLoginPressed,
+                                ),
                           SizedBox(height: buttonSpacing),
                           RichText(
                             text: TextSpan(
-                              text: 'Don’t Have An Account?  ',
+                              text: "Don't Have An Account?  ",
                               style: DefaultTextStyle.of(context).style,
                               children: [
                                 TextSpan(
@@ -101,12 +106,7 @@ class LoginView extends StatelessWidget {
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => RegisterView(),
-                                        ),
-                                      );
+                                      Get.toNamed('/registerParent');
                                     },
                                 ),
                               ],

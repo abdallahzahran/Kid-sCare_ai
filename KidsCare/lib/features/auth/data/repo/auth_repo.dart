@@ -73,8 +73,24 @@ class AuthRepo {
         }),
       );
 
-      return jsonDecode(response.body);
+      final responseData = jsonDecode(response.body);
+      print('Login API Response: $responseData'); // Debug print
+
+      if (response.statusCode == 200) {
+        return {
+          'status_code': 200,
+          'message': 'Login successful',
+          'email': email,
+          'username': responseData['username'] ?? input,
+        };
+      } else {
+        return {
+          'status_code': response.statusCode,
+          'message': responseData['message'] ?? 'Login failed',
+        };
+      }
     } catch (e) {
+      print('Login error: $e'); // Debug print
       return {
         'status_code': 500,
         'message': 'Network error occurred. Please try again.',

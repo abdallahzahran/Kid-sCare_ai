@@ -88,8 +88,8 @@ class _HomeTabState extends State<HomeTab> {
   @override
   void initState() {
     super.initState();
-    // Load first kid from cache
-    KidsService().loadFirstKidFromCache();
+    // Load data from cache
+    KidsService().loadFromCache();
   }
 
   void switchKid(int index) {

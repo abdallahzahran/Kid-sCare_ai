@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/models/register_model.dart';
 import '../../data/repo/auth_repo.dart';
 import 'register_state.dart';
+import '../../../../core/services/kids_service.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
   final AuthRepo _authRepo = AuthRepo();
@@ -30,40 +31,33 @@ class RegisterCubit extends Cubit<RegisterState> {
     emit(RegisterInitState());
   }
 
-  void onRegisterPressed() async {
+  Future<void> onRegisterPressed() async {
     if (formKey.currentState!.validate()) {
       if (passwordController.text != confirmPasswordController.text) {
         emit(RegisterErrorState('Passwords do not match'));
         return;
       }
 
-      final registerModel = RegisterModel(
-        username: usernameController.text,
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      
       emit(RegisterLoadingState());
-      
       try {
+        final registerModel = RegisterModel(
+          username: usernameController.text,
+          email: emailController.text,
+          password: passwordController.text,
+        );
+        
         final response = await _authRepo.register(registerModel);
-        print('Registration response: $response'); // Debug print
-
+        
         if (response['status_code'] == 200 || response['status_code'] == 201) {
-          final successRegisterModel = RegisterModel.fromJson(response);
-          emit(RegisterSuccessState(successRegisterModel));
-          print('User registered successfully: ${successRegisterModel.message}');
+          // Save parent name
+          KidsService().setParentName(usernameController.text);
+          
+          emit(RegisterSuccessState(RegisterModel.fromJson(response)));
         } else {
-          String errorMessage = response['message'] ?? 'An error occurred';
-          if (errorMessage.toLowerCase().contains('already exists')) {
-            errorMessage = 'This email or username is already registered. Please try logging in.';
-          }
-          emit(RegisterErrorState(errorMessage));
-          print('Error: $errorMessage');
+          emit(RegisterErrorState(response['message'] ?? 'Registration failed'));
         }
       } catch (e) {
-        emit(RegisterErrorState('Registration error: $e'));
-        print('Error: $e');
+        emit(RegisterErrorState(e.toString()));
       }
     } else {
       emit(RegisterErrorState('Please fill in all fields correctly.'));

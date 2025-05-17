@@ -6,6 +6,8 @@ import 'package:kidscare/features/profile/views/profile.dart';
 import 'package:kidscare/features/splash/views/add_kid.dart';
 import 'package:kidscare/features/dashboard/views/dashboard_view.dart';
 import 'package:kidscare/core/utils/app_assets.dart';
+import 'package:kidscare/core/services/kids_service.dart';
+import 'package:kidscare/features/profile/views/kids_info_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -73,17 +75,20 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  final List<Kid> kids = [
-    Kid(name: 'ALi Mohmed', avatarAsset: AppAssets.image),
-    Kid(name: 'Abdallah Mohmed', avatarAsset: AppAssets.image),
-    Kid(name: 'Hassan Mohmed', avatarAsset: AppAssets.image),
-  ];
+  List<Kid> get kids => KidsService().kids
+      .map((k) => Kid(name: k['name']!, avatarAsset: AppAssets.image))
+      .toList();
   int selectedKid = 0;
 
   void switchKid(int index) {
     setState(() {
       selectedKid = index;
     });
+  }
+
+  void _goToKidsInfoView() async {
+    await Navigator.push(context, MaterialPageRoute(builder: (_) => KidsInfoView()));
+    setState(() {}); // Refresh kids list after returning
   }
 
   @override
@@ -151,7 +156,6 @@ class SwitchKidSheet extends StatelessWidget {
         const Text('Switch Kids', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         const Divider(),
         ...List.generate(kids.length, (i) => ListTile(
-          leading: CircleAvatar(backgroundImage: AssetImage(kids[i].avatarAsset)),
           title: Text(kids[i].name),
           selected: i == selected,
           onTap: () => onSelect(i),

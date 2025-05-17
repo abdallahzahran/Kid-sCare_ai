@@ -31,24 +31,6 @@ class CustomUserCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              GestureDetector(
-                child: Container(
-                  margin: EdgeInsetsDirectional.only(end: 16),
-                  height: MyResponsive.height(context, value: 60),
-                  width: MyResponsive.height(context, value: 60),
-                  decoration: BoxDecoration(
-                    color: AppColors.blue,
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage(kid.avatarAsset),
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-                onTap: () {
-                  MyNavigator.goTo(screen: LoginView());
-                },
-              ),
               SizedBox(width: 12),
               Text(
                 kid.name,

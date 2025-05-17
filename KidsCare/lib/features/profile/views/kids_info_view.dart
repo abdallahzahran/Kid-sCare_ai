@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidscare/core/utils/app_colors.dart';
+import 'package:kidscare/core/services/kids_service.dart';
 
 class KidsInfoView extends StatefulWidget {
   const KidsInfoView({super.key});
@@ -9,11 +10,7 @@ class KidsInfoView extends StatefulWidget {
 }
 
 class _KidsInfoViewState extends State<KidsInfoView> {
-  List<Map<String, String>> kids = [
-    {'name': 'ALi Mohmed', 'email': 'Mohamed_sayed@gmail.com'},
-    {'name': 'ALi Mohmed', 'email': 'Mohamed_sayed@gmail.com'},
-    {'name': 'ALi Mohmed', 'email': 'Mohamed_sayed@gmail.com'},
-  ];
+  List<Map<String, String>> get kids => KidsService().kids;
 
   void _showKidDialog({Map<String, String>? kid, int? index}) {
     final nameController = TextEditingController(text: kid?['name'] ?? '');
@@ -48,9 +45,9 @@ class _KidsInfoViewState extends State<KidsInfoView> {
               };
               setState(() {
                 if (kid == null) {
-                  kids.add(newKid);
+                  KidsService().addKid(newKid);
                 } else if (index != null) {
-                  kids[index] = newKid;
+                  KidsService().updateKid(index, newKid);
                 }
               });
               Navigator.pop(context);
@@ -103,15 +100,7 @@ class _KidsInfoViewState extends State<KidsInfoView> {
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     child: Row(
                       children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: const BoxDecoration(
-                            color: AppColors.yellow,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 0),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

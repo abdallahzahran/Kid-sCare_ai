@@ -18,9 +18,30 @@ class AuthRepo {
         }),
       );
 
-      return jsonDecode(response.body); // Return the entire response body
+      final responseData = jsonDecode(response.body);
+      print('Raw API Response: $responseData'); // Debug print
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'status_code': response.statusCode,
+          'message': 'Registration successful',
+          'email': registerModel.email,
+          'username': registerModel.username,
+        };
+      } else {
+        // Handle error response
+        final errorMessage = responseData['message'] ?? 'Registration failed';
+        return {
+          'status_code': response.statusCode,
+          'message': errorMessage,
+        };
+      }
     } catch (e) {
-      throw Exception("Registration error: $e");
+      print('Registration error: $e'); // Debug print
+      return {
+        'status_code': 500,
+        'message': 'Network error occurred. Please try again.',
+      };
     }
   }
 
@@ -44,7 +65,7 @@ class AuthRepo {
       }
 
       final response = await http.post(
-        Uri.parse('https://authentication-node-sigma.vercel.app/api/auth/login'),
+        Uri.parse(_loginUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': email,
@@ -52,15 +73,11 @@ class AuthRepo {
         }),
       );
 
-      final result = jsonDecode(response.body);
-      return {
-        'status_code': response.statusCode,
-        'message': result['message'],
-      };
+      return jsonDecode(response.body);
     } catch (e) {
       return {
         'status_code': 500,
-        'message': 'Server error',
+        'message': 'Network error occurred. Please try again.',
       };
     }
   }

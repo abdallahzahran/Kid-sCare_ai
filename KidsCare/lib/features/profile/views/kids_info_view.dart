@@ -13,6 +13,17 @@ class _KidsInfoViewState extends State<KidsInfoView> {
   List<Map<String, String>> get kids => KidsService().kids;
 
   void _showDeleteConfirmation(int index) {
+    // Check if trying to delete first kid
+    if (index == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot delete the first kid. Please add another kid first.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -47,6 +58,7 @@ class _KidsInfoViewState extends State<KidsInfoView> {
   void _showKidDialog({Map<String, String>? kid, int? index}) {
     final nameController = TextEditingController(text: kid?['name'] ?? '');
     final emailController = TextEditingController(text: kid?['email'] ?? '');
+    final ageController = TextEditingController(text: kid?['age'] ?? '');
     final _formKey = GlobalKey<FormState>();
     showDialog(
       context: context,
@@ -72,6 +84,17 @@ class _KidsInfoViewState extends State<KidsInfoView> {
                   return null;
                 },
               ),
+              TextFormField(
+                controller: ageController,
+                decoration: const InputDecoration(labelText: 'Age'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'Age is required';
+                  final age = int.tryParse(value);
+                  if (age == null) return 'Enter a valid age';
+                  if (age < 0 || age > 18) return 'Age must be between 0 and 18';
+                  return null;
+                },
+              ),
             ],
           ),
         ),
@@ -86,6 +109,7 @@ class _KidsInfoViewState extends State<KidsInfoView> {
                 final newKid = {
                   'name': nameController.text,
                   'email': emailController.text,
+                  'age': ageController.text,
                 };
                 setState(() {
                   if (kid == null) {
@@ -151,6 +175,7 @@ class _KidsInfoViewState extends State<KidsInfoView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(kid['name']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              Text('Age: ${kid['age']}', style: const TextStyle(color: Colors.grey)),
                               Text(kid['email']!, style: const TextStyle(color: Colors.grey)),
                             ],
                           ),

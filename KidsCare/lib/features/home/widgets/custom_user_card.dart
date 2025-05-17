@@ -16,7 +16,11 @@ class CustomUserCard extends StatelessWidget {
   final Kid kid;
   final VoidCallback onSwitchKid;
 
-  const CustomUserCard({super.key, required this.kid, required this.onSwitchKid});
+  const CustomUserCard({
+    super.key,
+    required this.kid,
+    required this.onSwitchKid,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +36,33 @@ class CustomUserCard extends StatelessWidget {
           Row(
             children: [
               SizedBox(width: 12),
-              Text(
-                kid.name,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFFFBB600),
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    kid.name,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFFFBB600),
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Age: ${kid.age}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  Text(
+                    kid.email,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
               Spacer(),
               RegisterKidView(),

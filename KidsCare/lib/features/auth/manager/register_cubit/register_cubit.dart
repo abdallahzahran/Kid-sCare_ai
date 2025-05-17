@@ -32,22 +32,34 @@ class RegisterCubit extends Cubit<RegisterState> {
 
   void onRegisterPressed() async {
     if (formKey.currentState!.validate()) {
+      if (passwordController.text != confirmPasswordController.text) {
+        emit(RegisterErrorState('Passwords do not match'));
+        return;
+      }
+
       final registerModel = RegisterModel(
         username: usernameController.text,
         email: emailController.text,
         password: passwordController.text,
       );
+      
       emit(RegisterLoadingState());
+      
       try {
         final response = await _authRepo.register(registerModel);
+        print('Registration response: $response'); // Debug print
 
-        if (response['status_code'] == 200) {
+        if (response['status_code'] == 200 || response['status_code'] == 201) {
           final successRegisterModel = RegisterModel.fromJson(response);
           emit(RegisterSuccessState(successRegisterModel));
           print('User registered successfully: ${successRegisterModel.message}');
         } else {
-          emit(RegisterErrorState(response['message'] ?? 'An error occurred'));
-          print('Error: ${response['message']}');
+          String errorMessage = response['message'] ?? 'An error occurred';
+          if (errorMessage.toLowerCase().contains('already exists')) {
+            errorMessage = 'This email or username is already registered. Please try logging in.';
+          }
+          emit(RegisterErrorState(errorMessage));
+          print('Error: $errorMessage');
         }
       } catch (e) {
         emit(RegisterErrorState('Registration error: $e'));

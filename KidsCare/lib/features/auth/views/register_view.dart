@@ -36,19 +36,44 @@ class RegisterView extends StatelessWidget {
             return BlocConsumer<RegisterCubit, RegisterState>(
               listener: (context, state) {
                 if (state is RegisterSuccessState) {
-                  MyNavigator.goTo(
-                    screen: () => LoginView(),
-                    isReplace: true,
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.registerModel.message ?? 'Registration successful! Adding your first kid...'),
+                      backgroundColor: Colors.green,
+                    ),
                   );
                   Get.offAllNamed('/add_kid');
                 } else if (state is RegisterErrorState) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(state.error))
-                  );
-                  MyNavigator.goTo(
-                    screen: () => AddKidSplachView(),
-                  );
+                  String errorMessage = state.error;
+                  if (errorMessage.toLowerCase().contains('already exists')) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Account Already Exists'),
+                        content: Text('This email or username is already registered. Would you like to log in instead?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Get.offAllNamed('/login');
+                            },
+                            child: Text('Go to Login'),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(errorMessage),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 }
               },
               builder: (context, state) {

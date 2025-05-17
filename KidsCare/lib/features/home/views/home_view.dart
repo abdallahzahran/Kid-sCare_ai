@@ -76,13 +76,29 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> {
   List<Kid> get kids => KidsService().kids
-      .map((k) => Kid(name: k['name']!, avatarAsset: AppAssets.image))
+      .map((k) => Kid(
+            name: k['name']!,
+            email: k['email']!,
+            age: k['age']!,
+            avatarAsset: AppAssets.image,
+          ))
       .toList();
   int selectedKid = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load first kid from cache
+    KidsService().loadFirstKidFromCache();
+  }
 
   void switchKid(int index) {
     setState(() {
       selectedKid = index;
+      // Update first kid in KidsService
+      if (index < KidsService().kids.length) {
+        KidsService().updateFirstKid(index);
+      }
     });
   }
 
@@ -93,6 +109,10 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final currentKid = KidsService().kids.isNotEmpty 
+        ? KidsService().kids[selectedKid]
+        : null;
+    
     return Column(
       children: [
         CustomAppBar(),
@@ -111,20 +131,26 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                 ),
               ),
-              CustomUserCard(
-                kid: kids[selectedKid],
-                onSwitchKid: () => showModalBottomSheet(
-                  context: context,
-                  builder: (_) => SwitchKidSheet(
-                    kids: kids,
-                    selected: selectedKid,
-                    onSelect: (i) {
-                      switchKid(i);
-                      Navigator.pop(context);
-                    },
+              if (currentKid != null)
+                CustomUserCard(
+                  kid: Kid(
+                    name: currentKid['name']!,
+                    email: currentKid['email']!,
+                    age: currentKid['age']!,
+                    avatarAsset: AppAssets.image,
+                  ),
+                  onSwitchKid: () => showModalBottomSheet(
+                    context: context,
+                    builder: (_) => SwitchKidSheet(
+                      kids: kids,
+                      selected: selectedKid,
+                      onSelect: (i) {
+                        switchKid(i);
+                        Navigator.pop(context);
+                      },
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -135,8 +161,15 @@ class _HomeTabState extends State<HomeTab> {
 
 class Kid {
   final String name;
+  final String email;
+  final String age;
   final String avatarAsset;
-  Kid({required this.name, required this.avatarAsset});
+  Kid({
+    required this.name,
+    required this.email,
+    required this.age,
+    required this.avatarAsset,
+  });
 }
 
 class SwitchKidSheet extends StatelessWidget {
@@ -153,20 +186,44 @@ class SwitchKidSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 400,
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 16),
-          const Text('Switch Kids', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const Text(
+            'Switch Kids',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
           const Divider(),
-          Expanded(
+          Flexible(
             child: ListView.builder(
+              shrinkWrap: true,
               itemCount: kids.length,
               itemBuilder: (context, i) => ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: AssetImage(kids[i].avatarAsset),
+                ),
                 title: Text(kids[i].name),
+                subtitle: Text('Age: ${kids[i].age}'),
                 selected: i == selected,
+                selectedTileColor: AppColors.yellowLight.withOpacity(0.3),
                 onTap: () => onSelect(i),
               ),
             ),

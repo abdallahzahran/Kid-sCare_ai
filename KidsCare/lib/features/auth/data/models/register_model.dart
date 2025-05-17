@@ -8,13 +8,12 @@ class RegisterModel {
   RegisterModel({this.username, required this.email, required this.password, this.message, this.statusCode});
 
   factory RegisterModel.fromJson(Map<String, dynamic> json) {
-    final success = json['success'];
     return RegisterModel(
-      message: success['message'], // نفترض إن الـ message هنا
-      statusCode: success['status_code'], // ونفترض إن الـ statusCode هنا
-      email: '',
+      message: json['message'],
+      statusCode: json['status_code'],
+      email: json['email'] ?? '',
       password: '',
-      username: '',
+      username: json['username'] ?? '',
     );
   }
 }

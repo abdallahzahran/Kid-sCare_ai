@@ -90,8 +90,8 @@ class LoginView extends StatelessWidget {
                               ? const CircularProgressIndicator()
                               : CustomElevatedButton(
                                   textButton: 'Login',
-                                  onPressed: cubit.onLoginPressed,
-                                ),
+                            onPressed: cubit.onLoginPressed,
+                          ),
                           SizedBox(height: buttonSpacing),
                           RichText(
                             text: TextSpan(

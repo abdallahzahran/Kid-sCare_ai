@@ -140,7 +140,7 @@ class _ProfileViewState extends State<ProfileView> {
               ),
               onTap: () {
                 MyNavigator.goTo(
-                  screen: () => LoginView(),
+                  screen: const LoginView(),
                   isReplace: true,
                 );
               },

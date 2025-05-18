@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import '../models/register_model.dart';
 
 class AuthRepo {
-  final String _registerUrl = "https://authentication-node-sigma.vercel.app/api/auth/register";
-  final String _loginUrl = "https://authentication-node-sigma.vercel.app/api/auth/login";
+  final String _registerUrl = "https://authentication-node-gold.vercel.app/api/auth/register";
+  final String _loginUrl = "https://authentication-node-gold.vercel.app/api/auth/login";
 
   Future<Map<String, dynamic>> register(RegisterModel registerModel) async {
     try {

@@ -40,6 +40,7 @@ class RegisterCubit extends Cubit<RegisterState> {
 
       emit(RegisterLoadingState());
       try {
+        print('Registering with username: ${usernameController.text}, email: ${emailController.text}');
         final registerModel = RegisterModel(
           username: usernameController.text,
           email: emailController.text,
@@ -48,19 +49,30 @@ class RegisterCubit extends Cubit<RegisterState> {
         
         final response = await _authRepo.register(registerModel);
         
+        print('Registration API response: $response');
+
         if (response['status_code'] == 200 || response['status_code'] == 201) {
+          print('Registration successful');
           // Save parent name
           KidsService().setParentName(usernameController.text);
+          print('Parent name saved');
           
           emit(RegisterSuccessState(RegisterModel.fromJson(response)));
+          print('Emitted RegisterSuccessState');
         } else {
-          emit(RegisterErrorState(response['message'] ?? 'Registration failed'));
+          final errorMessage = response['message'] ?? 'Registration failed';
+          print('Registration failed with message: $errorMessage');
+          emit(RegisterErrorState(errorMessage));
+          print('Emitted RegisterErrorState');
         }
       } catch (e) {
-        emit(RegisterErrorState(e.toString()));
+        print('Registration exception caught: $e');
+        emit(RegisterErrorState('An unexpected error occurred: ${e.toString()}'));
+        print('Emitted RegisterErrorState from catch block');
       }
     } else {
       emit(RegisterErrorState('Please fill in all fields correctly.'));
+      print('Form validation failed');
     }
   }
 }

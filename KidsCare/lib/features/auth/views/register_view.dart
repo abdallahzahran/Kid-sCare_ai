@@ -72,7 +72,7 @@ class RegisterView extends StatelessWidget {
                         content: Text(errorMessage),
                         backgroundColor: Colors.red,
                       ),
-                    );
+                  );
                   }
                 }
               },
@@ -158,7 +158,7 @@ class RegisterView extends StatelessWidget {
                                       ),
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () {
-                                          Get.offAllNamed('/login');
+                                         MyNavigator.goTo(screen: LoginView(),isReplace: true);
                                         },
                                     ),
                                   ],

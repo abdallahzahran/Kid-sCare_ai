@@ -11,6 +11,7 @@ import 'package:kidscare/features/auth/views/login_view.dart';
 import 'package:kidscare/features/auth/views/register_view.dart';
 import 'package:kidscare/features/splash/views/add_kid.dart';
 import 'package:kidscare/features/splash/views/choose_user_view.dart';
+import 'package:kidscare/features/splash/views/splach_view.dart';
 import 'package:kidscare/features/home/views/home_view.dart';
 import 'features/time/manager/cubit/time_cubit/time_cubit.dart';
 
@@ -43,13 +44,14 @@ class KidsCareApp extends StatelessWidget {
           useMaterial3: true, // <-- هذا السطر يُفعل Material 3
           colorScheme: ColorScheme.fromSeed(seedColor: AppColors.yellow),
         ),
-        home: const ChooseUserView(),
+        home: const SplashView(),
         getPages: [
           GetPage(name: '/login', page: () => const LoginView()),
           GetPage(name: '/registerParent', page: () => const RegisterView()),
           GetPage(name: '/registerKid', page: () =>  AddKidSplachView()),
           GetPage(name: '/home', page: () => HomeView()),
           GetPage(name: '/add_kid', page: () =>  AddKidSplachView()),
+          GetPage(name: '/choose_user', page: () => const ChooseUserView()),
         ],
       ),
     );

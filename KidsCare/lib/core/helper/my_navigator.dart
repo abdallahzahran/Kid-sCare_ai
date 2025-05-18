@@ -1,19 +1,27 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 abstract class MyNavigator {
-  static goTo(
-      {required screen,
-        bool isReplace = false,
-        Transition transition = Transition.rightToLeftWithFade,
-        Duration? duration }) {
+  static goTo({
+    required Widget screen,
+    bool isReplace = false,
+    Transition transition = Transition.rightToLeftWithFade,
+    Duration? duration,
+  }) {
+    final transitionDuration = duration ?? const Duration(milliseconds: 300);
+    
     if (isReplace) {
-      Get.offAll(screen,
-          transition: Transition.downToUp,
-          duration: duration?? Duration(seconds: 1));
+      Get.offAll(
+        () => screen,
+        transition: transition,
+        duration: transitionDuration,
+      );
     } else {
-      Get.to(screen,
-          transition: Transition.downToUp,
-          duration: duration?? Duration(seconds: 1));
+      Get.to(
+        () => screen,
+        transition: transition,
+        duration: transitionDuration,
+      );
     }
   }
 }

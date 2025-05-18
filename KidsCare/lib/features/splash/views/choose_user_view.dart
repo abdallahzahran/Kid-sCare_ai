@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kidscare/core/cache/cache_helper.dart';
+import 'package:kidscare/core/cache/cache_keys.dart';
 import 'package:kidscare/core/helper/my_navigator.dart';
 import 'package:kidscare/core/widget/custom_elvated_btn.dart';
 import 'package:kidscare/core/widget/custom_svg.dart';
@@ -10,7 +11,7 @@ import '../../../core/utils/app_assets.dart';
 import '../../../core/helper/my_responsive.dart';
 
 class ChooseUserView extends StatelessWidget {
-  const ChooseUserView ({super.key});
+  const ChooseUserView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,17 +31,25 @@ class ChooseUserView extends StatelessWidget {
                 SizedBox(height: verticalSpacing),
                 CustomElevatedButton(
                   textButton: 'Parent',
-                  onPressed: () {
-                    CacheHelper.saveData(key: 'userType', value: 'parent');
-                     MyNavigator.goTo(screen:  const RegisterView() ,isReplace: true);
+                  onPressed: () async {
+                    try {
+                      await CacheHelper.saveData(key: CacheKeys.userType, value: 'parent');
+                      MyNavigator.goTo(screen: const RegisterView(), isReplace: true);
+                    } catch (e) {
+                      print('Error saving user type: $e');
+                    }
                   },
                 ),
                 SizedBox(height: verticalSpacing),
                 CustomElevatedButton(
                   textButton: 'Kid',
-                  onPressed: () {
-                    CacheHelper.saveData(key: 'userType', value: 'kid');
-                    MyNavigator.goTo(screen:   RegisterKidView(),isReplace: true);
+                  onPressed: () async {
+                    try {
+                      await CacheHelper.saveData(key: CacheKeys.userType, value: 'kid');
+                      MyNavigator.goTo(screen: RegisterKidView(), isReplace: true);
+                    } catch (e) {
+                      print('Error saving user type: $e');
+                    }
                   },
                 ),
                 SizedBox(height: verticalSpacing),

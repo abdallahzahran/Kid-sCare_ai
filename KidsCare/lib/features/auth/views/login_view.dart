@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:kidscare/core/helper/my_navigator.dart';
 import 'package:kidscare/core/helper/my_validator.dart';
 import 'package:kidscare/core/utils/app_assets.dart';
 import 'package:kidscare/core/utils/app_colors.dart';
@@ -90,8 +91,8 @@ class LoginView extends StatelessWidget {
                               ? const CircularProgressIndicator()
                               : CustomElevatedButton(
                                   textButton: 'Login',
-                            onPressed: cubit.onLoginPressed,
-                          ),
+                                  onPressed: cubit.onLoginPressed,
+                                ),
                           SizedBox(height: buttonSpacing),
                           RichText(
                             text: TextSpan(
@@ -106,7 +107,7 @@ class LoginView extends StatelessWidget {
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      Get.toNamed('/registerParent');
+                                      Get.toNamed('/register');
                                     },
                                 ),
                               ],

@@ -14,7 +14,7 @@ class _KidsInfoViewState extends State<KidsInfoView> {
 
   void _showDeleteConfirmation(int index) {
     // Check if trying to delete first kid
-    if (index == 0) {
+    if (!KidsService().canDeleteKid(index)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Cannot delete the first kid. Please add another kid first.'),

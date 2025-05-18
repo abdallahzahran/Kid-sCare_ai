@@ -4,6 +4,9 @@ import '../../data/models/register_model.dart';
 import '../../data/repo/auth_repo.dart';
 import 'register_state.dart';
 import '../../../../core/services/kids_service.dart';
+import '../../../../core/cache/cache_helper.dart';
+import '../../../../core/cache/cache_keys.dart';
+import '../../../../core/cache/cache_data.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
   final AuthRepo _authRepo = AuthRepo();
@@ -48,12 +51,21 @@ class RegisterCubit extends Cubit<RegisterState> {
         );
         
         final response = await _authRepo.register(registerModel);
-        
         print('Registration API response: $response');
 
         if (response['status_code'] == 200 || response['status_code'] == 201) {
           print('Registration successful');
-          // Save parent name
+          
+          // Save user data in cache
+          await CacheHelper.saveData(key: CacheKeys.isLoggedIn, value: true);
+          await CacheHelper.saveData(key: CacheKeys.userEmail, value: emailController.text);
+          await CacheHelper.saveData(key: CacheKeys.username, value: usernameController.text);
+          await CacheHelper.saveData(key: CacheKeys.password, value: passwordController.text);
+          
+          // Set registration as not complete yet (will be completed after adding kid)
+          await CacheData.setRegistrationComplete(false);
+          
+          // Save parent name in KidsService
           KidsService().setParentName(usernameController.text);
           print('Parent name saved');
           
@@ -73,6 +85,27 @@ class RegisterCubit extends Cubit<RegisterState> {
     } else {
       emit(RegisterErrorState('Please fill in all fields correctly.'));
       print('Form validation failed');
+    }
+  }
+
+  Future<void> checkRegistrationStatus() async {
+    try {
+      final isLoggedIn = CacheHelper.getData(key: CacheKeys.isLoggedIn) ?? false;
+      if (isLoggedIn) {
+        final username = CacheHelper.getData(key: CacheKeys.username)?.toString();
+        final email = CacheHelper.getData(key: CacheKeys.userEmail)?.toString();
+        if (username != null && email != null) {
+          KidsService().setParentName(username);
+          emit(RegisterSuccessState(RegisterModel(
+            username: username,
+            email: email,
+            password: '', // Don't load password from cache for security
+          )));
+        }
+      }
+    } catch (e) {
+      print('Error checking registration status: $e');
+      emit(RegisterErrorState('Error checking registration status'));
     }
   }
 }

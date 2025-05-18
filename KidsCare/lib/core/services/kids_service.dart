@@ -1,120 +1,156 @@
+import 'dart:convert';
 import 'package:kidscare/core/cache/cache_helper.dart';
+import 'package:kidscare/core/cache/cache_keys.dart';
 
 class KidsService {
   static final KidsService _instance = KidsService._internal();
   factory KidsService() => _instance;
   KidsService._internal();
 
-  final List<Map<String, String>> _kids = [];
-  Map<String, String>? _firstKid;
+  String? _userEmail;
   String? _userName;
   String? _parentName;
   String? _parentPhotoPath;
+  final List<Map<String, String>> _kids = [];
+  int _firstKidIndex = 0;
 
-  List<Map<String, String>> get kids => _kids;
-  Map<String, String>? get firstKid => _firstKid;
+  // Getter for unmodifiable kids list
+  List<Map<String, String>> get kids => List.unmodifiable(_kids);
+
+  // Getter for first kid index
+  int get firstKidIndex => _firstKidIndex;
+
+  // Getter for user email
+  String? get userEmail => _userEmail;
+
+  // Getter for user name
   String? get userName => _userName;
+
+  // Getter for parent name
   String? get parentName => _parentName;
+
+  // Getter for parent photo path
   String? get parentPhotoPath => _parentPhotoPath;
 
-  void setUserName(String name) {
+  // Setter for user email
+  Future<void> setUserEmail(String email) async {
+    if (email.isEmpty) {
+      throw Exception('Email cannot be empty');
+    }
+    _userEmail = email;
+    await CacheHelper.saveData(key: CacheKeys.userEmail, value: email);
+  }
+
+  // Setter for user name
+  Future<void> setUserName(String name) async {
+    if (name.isEmpty) {
+      throw Exception('Name cannot be empty');
+    }
     _userName = name;
-    CacheHelper.saveData(key: 'user_name', value: name);
+    await CacheHelper.saveData(key: CacheKeys.userName, value: name);
   }
 
-  void setParentName(String name) {
+  // Setter for parent name
+  Future<void> setParentName(String name) async {
+    if (name.isEmpty) {
+      throw Exception('Parent name cannot be empty');
+    }
     _parentName = name;
-    CacheHelper.saveData(key: 'parent_name', value: name);
+    await CacheHelper.saveData(key: CacheKeys.parentName, value: name);
   }
 
-  void setParentPhotoPath(String path) {
+  // Setter for parent photo path
+  Future<void> setParentPhotoPath(String path) async {
+    if (path.isEmpty) {
+      throw Exception('Photo path cannot be empty');
+    }
     _parentPhotoPath = path;
-    CacheHelper.saveData(key: 'parent_photo_path', value: path);
+    await CacheHelper.saveData(key: CacheKeys.parentPhotoPath, value: path);
   }
 
-  void addKid(Map<String, String> kid) {
+  // Add a new kid
+  Future<void> addKid(Map<String, String> kid) async {
+    if (kid.isEmpty) {
+      throw Exception('Kid data cannot be empty');
+    }
+    if (!kid.containsKey('name') || !kid.containsKey('email') || !kid.containsKey('age')) {
+      throw Exception('Kid data must contain name, email, and age');
+    }
     _kids.add(kid);
-    if (_firstKid == null) {
-      _firstKid = kid;
-      // Store first kid info in cache
-      CacheHelper.saveData(key: 'first_kid_name', value: kid['name'] ?? '');
-      CacheHelper.saveData(key: 'first_kid_email', value: kid['email'] ?? '');
-      CacheHelper.saveData(key: 'first_kid_age', value: kid['age'] ?? '');
+    await _saveKidsToCache();
+  }
+
+  // Save kids to cache
+  Future<void> _saveKidsToCache() async {
+    if (_userEmail == null) {
+      throw Exception('User email must be set before saving kids');
+    }
+    try {
+      final kidsJson = jsonEncode(_kids);
+      await CacheHelper.saveData(
+        key: '${CacheKeys.kidsList}_$_userEmail',
+        value: kidsJson,
+      );
+    } catch (e) {
+      throw Exception('Failed to save kids to cache: $e');
     }
   }
 
-  void updateKid(int index, Map<String, String> kid) {
-    if (index >= 0 && index < _kids.length) {
-      _kids[index] = kid;
-      // If updating first kid, update cache
-      if (index == 0) {
-        _firstKid = kid;
-        CacheHelper.saveData(key: 'first_kid_name', value: kid['name'] ?? '');
-        CacheHelper.saveData(key: 'first_kid_email', value: kid['email'] ?? '');
-        CacheHelper.saveData(key: 'first_kid_age', value: kid['age'] ?? '');
-      }
-    }
-  }
-
-  void updateFirstKid(int index) {
-    if (index >= 0 && index < _kids.length) {
-      _firstKid = _kids[index];
-      // Update cache with new first kid info
-      CacheHelper.saveData(key: 'first_kid_name', value: _kids[index]['name'] ?? '');
-      CacheHelper.saveData(key: 'first_kid_email', value: _kids[index]['email'] ?? '');
-      CacheHelper.saveData(key: 'first_kid_age', value: _kids[index]['age'] ?? '');
-    }
-  }
-
-  void deleteKid(int index) {
-    if (index >= 0 && index < _kids.length) {
-      _kids.removeAt(index);
-      // If deleting first kid, update first kid reference
-      if (index == 0 && _kids.isNotEmpty) {
-        _firstKid = _kids[0];
-        CacheHelper.saveData(key: 'first_kid_name', value: _kids[0]['name'] ?? '');
-        CacheHelper.saveData(key: 'first_kid_email', value: _kids[0]['email'] ?? '');
-        CacheHelper.saveData(key: 'first_kid_age', value: _kids[0]['age'] ?? '');
-      } else if (_kids.isEmpty) {
-        _firstKid = null;
-        CacheHelper.removeData(key: 'first_kid_name');
-        CacheHelper.removeData(key: 'first_kid_email');
-        CacheHelper.removeData(key: 'first_kid_age');
-      }
-    }
-  }
-
-  // Load data from cache on app start
+  // Load data from cache
   Future<void> loadFromCache() async {
-    // Load first kid
-    final name = CacheHelper.getData(key: 'first_kid_name');
-    final email = CacheHelper.getData(key: 'first_kid_email');
-    final age = CacheHelper.getData(key: 'first_kid_age');
+    try {
+      _userEmail = await CacheHelper.getData(key: CacheKeys.userEmail) as String?;
+      _userName = await CacheHelper.getData(key: CacheKeys.userName) as String?;
+      _parentName = await CacheHelper.getData(key: CacheKeys.parentName) as String?;
+      _parentPhotoPath = await CacheHelper.getData(key: CacheKeys.parentPhotoPath) as String?;
+      
+      if (_userEmail != null) {
+        final kidsJson = await CacheHelper.getData(key: '${CacheKeys.kidsList}_$_userEmail') as String?;
+        if (kidsJson != null) {
+          final List<dynamic> decodedKids = jsonDecode(kidsJson);
+          _kids.clear();
+          _kids.addAll(decodedKids.map((kid) => Map<String, String>.from(kid)));
+        }
+      }
+    } catch (e) {
+      throw Exception('Failed to load data from cache: $e');
+    }
+  }
+
+  // Update first kid index
+  Future<void> updateFirstKid(int index) async {
+    if (index < 0 || index >= _kids.length) {
+      throw Exception('Invalid kid index');
+    }
+    _firstKidIndex = index;
+    await CacheHelper.saveData(
+      key: '${CacheKeys.firstKidIndex}_$_userEmail',
+      value: index.toString(),
+    );
+  }
+
+  // Get first kid
+  Map<String, String>? getFirstKid() {
+    if (_kids.isEmpty) return null;
+    return _kids[_firstKidIndex];
+  }
+
+  // Clear all data
+  Future<void> clearAll() async {
+    _kids.clear();
+    _userEmail = null;
+    _userName = null;
+    _parentName = null;
+    _parentPhotoPath = null;
+    _firstKidIndex = 0;
     
-    if (name != null && email != null && age != null) {
-      _firstKid = {
-        'name': name.toString(),
-        'email': email.toString(),
-        'age': age.toString(),
-      };
+    if (_userEmail != null) {
+      await CacheHelper.removeData(key: '${CacheKeys.kidsList}_$_userEmail');
+      await CacheHelper.removeData(key: '${CacheKeys.firstKidIndex}_$_userEmail');
     }
-
-    // Load user name
-    final userName = CacheHelper.getData(key: 'user_name');
-    if (userName != null) {
-      _userName = userName.toString();
-    }
-
-    // Load parent name
-    final parentName = CacheHelper.getData(key: 'parent_name');
-    if (parentName != null) {
-      _parentName = parentName.toString();
-    }
-
-    // Load parent photo path
-    final parentPhotoPath = CacheHelper.getData(key: 'parent_photo_path');
-    if (parentPhotoPath != null) {
-      _parentPhotoPath = parentPhotoPath.toString();
-    }
+    await CacheHelper.removeData(key: CacheKeys.userEmail);
+    await CacheHelper.removeData(key: CacheKeys.userName);
+    await CacheHelper.removeData(key: CacheKeys.parentName);
+    await CacheHelper.removeData(key: CacheKeys.parentPhotoPath);
   }
 } 

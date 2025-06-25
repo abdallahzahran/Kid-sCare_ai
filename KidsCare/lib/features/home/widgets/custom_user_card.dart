@@ -7,6 +7,8 @@ import '../../../core/helper/my_navigator.dart';
 import '../../../core/helper/my_responsive.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../auth/views/login_view.dart';
+import '../../kid/app_list_view.dart';
+import '../../kid/history_calls_view.dart';
 import '../../time/views/bounus_time.dart';
 import '../../time/views/set_time_view.dart';
 import 'custom_action_btn.dart';
@@ -88,11 +90,13 @@ class CustomUserCard extends StatelessWidget {
               ),
               CustomActionBottom(
                 icon: CustomSvg(assetPath: AppAssets.app),
-                onPressed: () {},
+                onPressed: () {
+                  MyNavigator.goTo(screen:  AppListScreen());
+                },
               ),
               CustomActionBottom(
                 icon: CustomSvg(assetPath: AppAssets.calls),
-                onPressed: () {},
+                onPressed: () { MyNavigator.goTo(screen:  HistoryScreen());},
               ),
               ElevatedButton(
                 onPressed: (){},

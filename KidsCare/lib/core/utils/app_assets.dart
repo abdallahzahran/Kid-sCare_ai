@@ -23,5 +23,6 @@ abstract class AppAssets {
   // Assets image
   static const String basePathImage = "assets/images/";
   static const String image = "${basePathImage}profile.png";
+  static const String liveDisplayImage = '${basePathImage}live_display_screen.png';
 
 }

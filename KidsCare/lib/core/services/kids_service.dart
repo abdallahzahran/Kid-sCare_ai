@@ -39,6 +39,8 @@ class KidsService {
     }
     _userEmail = email;
     await CacheHelper.saveData(key: CacheKeys.userEmail, value: email);
+    // Load kids for this user when email is set
+    await loadKidsForUser(email);
   }
 
   // Setter for user name
@@ -70,6 +72,9 @@ class KidsService {
 
   // Add a new kid
   Future<void> addKid(Map<String, String> kid) async {
+    if (_userEmail == null) {
+      throw Exception('User email must be set before adding kids');
+    }
     if (kid.isEmpty) {
       throw Exception('Kid data cannot be empty');
     }
@@ -88,11 +93,36 @@ class KidsService {
     try {
       final kidsJson = jsonEncode(_kids);
       await CacheHelper.saveData(
-        key: '${CacheKeys.kidsList}_$_userEmail',
+        key: 'kids_${_userEmail}',
         value: kidsJson,
+      );
+      // Save first kid index
+      await CacheHelper.saveData(
+        key: 'first_kid_${_userEmail}',
+        value: _firstKidIndex.toString(),
       );
     } catch (e) {
       throw Exception('Failed to save kids to cache: $e');
+    }
+  }
+
+  // Load kids for specific user
+  Future<void> loadKidsForUser(String email) async {
+    try {
+      final kidsJson = await CacheHelper.getData(key: 'kids_$email') as String?;
+      if (kidsJson != null) {
+        final List<dynamic> decodedKids = jsonDecode(kidsJson);
+        _kids.clear();
+        _kids.addAll(decodedKids.map((kid) => Map<String, String>.from(kid)));
+      }
+
+      // Load first kid index
+      final firstKidIndexStr = await CacheHelper.getData(key: 'first_kid_$email') as String?;
+      if (firstKidIndexStr != null) {
+        _firstKidIndex = int.parse(firstKidIndexStr);
+      }
+    } catch (e) {
+      throw Exception('Failed to load kids for user: $e');
     }
   }
 
@@ -105,12 +135,7 @@ class KidsService {
       _parentPhotoPath = await CacheHelper.getData(key: CacheKeys.parentPhotoPath) as String?;
       
       if (_userEmail != null) {
-        final kidsJson = await CacheHelper.getData(key: '${CacheKeys.kidsList}_$_userEmail') as String?;
-        if (kidsJson != null) {
-          final List<dynamic> decodedKids = jsonDecode(kidsJson);
-          _kids.clear();
-          _kids.addAll(decodedKids.map((kid) => Map<String, String>.from(kid)));
-        }
+        await loadKidsForUser(_userEmail!);
       }
     } catch (e) {
       throw Exception('Failed to load data from cache: $e');
@@ -119,12 +144,15 @@ class KidsService {
 
   // Update first kid index
   Future<void> updateFirstKid(int index) async {
+    if (_userEmail == null) {
+      throw Exception('User email must be set before updating first kid');
+    }
     if (index < 0 || index >= _kids.length) {
       throw Exception('Invalid kid index');
     }
     _firstKidIndex = index;
     await CacheHelper.saveData(
-      key: '${CacheKeys.firstKidIndex}_$_userEmail',
+      key: 'first_kid_${_userEmail}',
       value: index.toString(),
     );
   }
@@ -135,8 +163,12 @@ class KidsService {
     return _kids[_firstKidIndex];
   }
 
-  // Clear all data
+  // Clear all data for current user
   Future<void> clearAll() async {
+    if (_userEmail != null) {
+      await CacheHelper.removeData(key: 'kids_${_userEmail}');
+      await CacheHelper.removeData(key: 'first_kid_${_userEmail}');
+    }
     _kids.clear();
     _userEmail = null;
     _userName = null;
@@ -144,13 +176,71 @@ class KidsService {
     _parentPhotoPath = null;
     _firstKidIndex = 0;
     
-    if (_userEmail != null) {
-      await CacheHelper.removeData(key: '${CacheKeys.kidsList}_$_userEmail');
-      await CacheHelper.removeData(key: '${CacheKeys.firstKidIndex}_$_userEmail');
-    }
     await CacheHelper.removeData(key: CacheKeys.userEmail);
     await CacheHelper.removeData(key: CacheKeys.userName);
     await CacheHelper.removeData(key: CacheKeys.parentName);
     await CacheHelper.removeData(key: CacheKeys.parentPhotoPath);
+  }
+
+  // Check if a kid can be deleted
+  bool canDeleteKid(int index) {
+    print('Checking if kid can be deleted:');
+    print('User Email: $_userEmail');
+    print('Kids List Length: ${_kids.length}');
+    print('Index to delete: $index');
+    
+    if (_userEmail == null) {
+      print('Error: User email is not set');
+      return false;
+    }
+    
+    if (index < 0 || index >= _kids.length) {
+      print('Error: Invalid index $index for kids list of length ${_kids.length}');
+      return false;
+    }
+    
+    if (_kids.length <= 1) {
+      print('Error: Cannot delete the only kid');
+      return false;
+    }
+    
+    print('Kid can be deleted');
+    return true;
+  }
+
+  // Delete a specific kid
+  Future<void> deleteKid(int index) async {
+    print('Attempting to delete kid:');
+    print('User Email: $_userEmail');
+    print('Index to delete: $index');
+    
+    if (_userEmail == null) {
+      throw Exception('User email must be set before deleting kid');
+    }
+    if (index < 0 || index >= _kids.length) {
+      throw Exception('Invalid kid index');
+    }
+    
+    _kids.removeAt(index);
+    if (_firstKidIndex >= _kids.length) {
+      _firstKidIndex = _kids.isEmpty ? 0 : _kids.length - 1;
+    }
+    await _saveKidsToCache();
+    print('Kid deleted successfully');
+  }
+
+  // Update a specific kid
+  Future<void> updateKid(int index, Map<String, String> kid) async {
+    if (_userEmail == null) {
+      throw Exception('User email must be set before updating kid');
+    }
+    if (index < 0 || index >= _kids.length) {
+      throw Exception('Invalid kid index');
+    }
+    if (!kid.containsKey('name') || !kid.containsKey('email') || !kid.containsKey('age')) {
+      throw Exception('Kid data must contain name, email, and age');
+    }
+    _kids[index] = kid;
+    await _saveKidsToCache();
   }
 } 

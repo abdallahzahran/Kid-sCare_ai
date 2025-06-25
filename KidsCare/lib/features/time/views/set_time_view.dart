@@ -1,91 +1,108 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+
+// Assuming these are your core utility files and widgets
 import 'package:kidscare/core/utils/app_colors.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';  // Add the Bloc package
 import '../../../core/helper/my_responsive.dart';
 import '../../../core/utils/app_assets.dart';
 import '../../../core/widget/custom_elvated_btn.dart';
 import '../../../core/widget/custom_svg.dart';
 import 'package:kidscare/features/home/widgets/custom_action_btn.dart';
-import '../manager/cubit/time_cubit/time_cubit.dart';
-import 'package:intl/intl.dart';  // Correct import here
+
+// Your Cubit
+import '../manager/cubit/time_cubit/time_cubit.dart'; // Make sure this path is correct
 
 class SetTimeView extends StatelessWidget {
   const SetTimeView({super.key});
 
+  // Helper function to format TimeOfDay into a readable string
   String formatTime(TimeOfDay time) {
     final now = DateTime.now();
+    // Create a DateTime object with today's date and the given time
     final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-    return DateFormat('hh:mm a').format(dt); // Example: 09:00 AM
+    // Format the DateTime object to 'hh:mm a' (e.g., 09:00 AM)
+    return DateFormat('hh:mm a').format(dt);
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => TimeCubit(),
-      child: CustomActionBottom(
-        icon: CustomSvg(assetPath: AppAssets.time),
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: AppColors.blue,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-            ),
-            builder: (context) {
-              return SizedBox(
-                height: MyResponsive.height(context, value: 320),
+    // The BlocProvider should *not* be here for the modal bottom sheet scenario,
+    // as the modal sheet creates a new context branch.
+    return CustomActionBottom(
+      icon: CustomSvg(assetPath: AppAssets.time),
+      onPressed: () {
+        // Show the modal bottom sheet when the button is pressed
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true, // Allows the sheet to take full screen height if needed
+          backgroundColor: AppColors.blue, // Custom background color
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25)), // Rounded top corners
+          ),
+          builder: (modalContext) { // Use modalContext to distinguish from the parent context
+            return BlocProvider(
+              create: (_) => TimeCubit(), // Create a new instance of TimeCubit for the modal
+              child: SizedBox(
+                height: MyResponsive.height(modalContext, value: 320), // Set fixed height for the sheet
                 child: BlocBuilder<TimeCubit, Map<String, TimeOfDay>>(
-                  builder: (context, timeState) {
-                    final startTime = timeState['startTime']!;
-                    final endTime = timeState['endTime']!;
+                  builder: (blocBuilderContext, timeState) { // Use blocBuilderContext for inner widgets
+                    final startTime = timeState['startTime']!; // Get start time from cubit state
+                    final endTime = timeState['endTime']!;     // Get end time from cubit state
                     return Padding(
-                      padding: EdgeInsets.all(MyResponsive.width(context, value: 16)),
+                      padding: EdgeInsets.all(MyResponsive.width(modalContext, value: 16)),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center, // Centering horizontally
+                        crossAxisAlignment: CrossAxisAlignment.center, // Center contents horizontally
                         children: [
                           Text(
                             'Set Time',
                             style: TextStyle(
-                              fontSize: MyResponsive.width(context, value: 25),
+                              fontSize: MyResponsive.width(modalContext, value: 25),
                               color: AppColors.yellowLight,
                             ),
                           ),
-                          const Divider(thickness: 0.2),
-                          SizedBox(height: MyResponsive.height(context, value: 20)),
+                          const Divider(thickness: 0.2), // A thin divider
+                          SizedBox(height: MyResponsive.height(modalContext, value: 20)),
                           TimeRangeDisplay(
-                            start: formatTime(startTime),
-                            end: formatTime(endTime),
+                            start: formatTime(startTime), // Display formatted start time
+                            end: formatTime(endTime),     // Display formatted end time
                             onStartTap: () async {
+                              // Show time picker for start time
                               final picked = await showTimePicker(
-                                context: context,
+                                context: blocBuilderContext, // Use context where cubit is accessible
                                 initialTime: startTime,
                               );
                               if (picked != null) {
-                                context.read<TimeCubit>().updateStartTime(picked);
+                                // Update start time in cubit if a time is picked
+                                blocBuilderContext.read<TimeCubit>().updateStartTime(picked);
                               }
                             },
                             onEndTap: () async {
+                              // Show time picker for end time
                               final picked = await showTimePicker(
-                                context: context,
+                                context: blocBuilderContext, // Use context where cubit is accessible
                                 initialTime: endTime,
                               );
                               if (picked != null) {
-                                context.read<TimeCubit>().updateEndTime(picked);
+                                // Update end time in cubit if a time is picked
+                                blocBuilderContext.read<TimeCubit>().updateEndTime(picked);
                               }
                             },
                           ),
-                          SizedBox(height: MyResponsive.height(context, value: 16)),
+                          SizedBox(height: MyResponsive.height(modalContext, value: 16)),
                           CustomElevatedButton(
                             textButton: 'Done',
                             shadowColor: AppColors.yellowLight,
                             onPressed: () {
-                              Navigator.pop(context);
+                              Navigator.pop(modalContext); // Close the bottom sheet
+                              // Show a success message using a SnackBar
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Child usage time saved successfully',style: TextStyle(color: AppColors.blue),),
+                                  content: Text(
+                                    'Child usage time saved successfully',
+                                    style: TextStyle(color: AppColors.blue),
+                                  ),
                                   backgroundColor: AppColors.yellow,
-
                                 ),
                               );
                             },
@@ -97,15 +114,16 @@ class SetTimeView extends StatelessWidget {
                     );
                   },
                 ),
-              );
-            },
-          );
-        },
-      ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
 
+// Widget to display the time range and handle taps to open time pickers
 class TimeRangeDisplay extends StatelessWidget {
   final String start;
   final String end;
@@ -124,10 +142,11 @@ class TimeRangeDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(MyResponsive.width(context, value: 15.0)),
-      color: AppColors.blue,
+      color: AppColors.blue, // Background color for the time range container
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center, // Center the row content
+        mainAxisAlignment: MainAxisAlignment.center, // Center the time boxes horizontally
         children: <Widget>[
+          // GestureDetector for the start time box
           GestureDetector(onTap: onStartTap, child: _TimeBox(time: start)),
           SizedBox(width: MyResponsive.width(context, value: 12.0)),
           Text(
@@ -138,6 +157,7 @@ class TimeRangeDisplay extends StatelessWidget {
             ),
           ),
           SizedBox(width: MyResponsive.width(context, value: 12.0)),
+          // GestureDetector for the end time box
           GestureDetector(onTap: onEndTap, child: _TimeBox(time: end)),
         ],
       ),
@@ -145,6 +165,7 @@ class TimeRangeDisplay extends StatelessWidget {
   }
 }
 
+// Private widget for a single time display box
 class _TimeBox extends StatelessWidget {
   final String time;
 
@@ -159,7 +180,7 @@ class _TimeBox extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(MyResponsive.width(context, value: 10.0)),
-        border: Border.all(color: AppColors.yellow, width: 1),
+        border: Border.all(color: AppColors.yellow, width: 1), // Yellow border
       ),
       child: Text(
         time,

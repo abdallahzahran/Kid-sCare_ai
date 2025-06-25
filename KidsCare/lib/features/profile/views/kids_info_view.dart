@@ -10,11 +10,29 @@ class KidsInfoView extends StatefulWidget {
 }
 
 class _KidsInfoViewState extends State<KidsInfoView> {
-  List<Map<String, String>> get kids => KidsService().kids;
+  final KidsService _kidsService = KidsService();
+  List<Map<String, String>> get kids => _kidsService.kids;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadKids();
+  }
+
+  Future<void> _loadKids() async {
+    try {
+      await _kidsService.loadFromCache();
+      setState(() {});
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading kids: $e')),
+      );
+    }
+  }
 
   void _showDeleteConfirmation(int index) {
     // Check if trying to delete first kid
-    if (!KidsService().canDeleteKid(index)) {
+    if (!_kidsService.canDeleteKid(index)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Cannot delete the first kid. Please add another kid first.'),
@@ -37,7 +55,7 @@ class _KidsInfoViewState extends State<KidsInfoView> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                KidsService().deleteKid(index);
+                _kidsService.deleteKid(index);
               });
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -113,9 +131,9 @@ class _KidsInfoViewState extends State<KidsInfoView> {
                 };
                 setState(() {
                   if (kid == null) {
-                    KidsService().addKid(newKid);
+                    _kidsService.addKid(newKid);
                   } else if (index != null) {
-                    KidsService().updateKid(index, newKid);
+                    _kidsService.updateKid(index, newKid);
                   }
                 });
                 Navigator.pop(context);

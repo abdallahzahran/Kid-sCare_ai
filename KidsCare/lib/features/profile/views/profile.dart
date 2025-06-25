@@ -120,18 +120,18 @@ class _ProfileViewState extends State<ProfileView> {
               },
             ),
             const SizedBox(height: 16),
-            InkWell(
-              child: CustomCardProfile(
-                iconPath: AppAssets.settings,
-                text: 'Settings',
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomeView()),
-                );
-              },
-            ),
+            // InkWell(
+            //   child: CustomCardProfile(
+            //     iconPath: AppAssets.settings,
+            //     text: 'Settings',
+            //   ),
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => HomeView()),
+            //     );
+            //   },
+            // ),
             const SizedBox(height: 16),
             InkWell(
               child: CustomCardProfile(

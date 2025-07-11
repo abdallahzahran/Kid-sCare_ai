@@ -14,7 +14,10 @@ import '../auth/views/login_view.dart';
 import 'package:kidscare/core/services/kids_service.dart';
 
 class RegisterKidView extends StatelessWidget {
-  RegisterKidView({super.key});
+  // 1. الدالة التي ستُستدعى بعد إضافة الطفل (مطلوبة)
+  final Function(Map<String, String>) onKidAdded;
+
+  RegisterKidView({super.key, required this.onKidAdded});
 
   final nameController = TextEditingController();
   final ageController = TextEditingController();
@@ -70,11 +73,17 @@ class RegisterKidView extends StatelessWidget {
                     shadowColor: AppColors.yellowLight,
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        KidsService().addKid({
+                        final newKidData = {
                           'name': nameController.text,
                           'email': emailController.text,
                           'age': ageController.text,
-                        });
+                        };
+                        KidsService().addKid(newKidData);
+
+                        // 3. استدعاء الدالة وتمرير بيانات الطفل الجديدة
+                        // هذه الدالة لا تزال ضرورية لأن HomeTab قد يناديها
+                        onKidAdded(newKidData);
+
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(

@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:kidscare/core/utils/app_assets.dart';
-import 'package:kidscare/core/widget/custom_elvated_btn.dart';
 import 'package:kidscare/core/widget/custom_svg.dart';
-import 'package:kidscare/features/kid/add_kid_view.dart';
 import '../../../core/helper/my_navigator.dart';
-import '../../../core/helper/my_responsive.dart';
 import '../../../core/utils/app_colors.dart';
-import '../../auth/views/login_view.dart';
 import '../../kid/app_list_view.dart';
 import '../../kid/history_calls_view.dart';
 import '../../time/views/bounus_time.dart';
 import '../../time/views/set_time_view.dart';
 import 'custom_action_btn.dart';
-import '../../home/views/home_view.dart';
+import '../../home/views/home_view.dart'; // تأكد من أن هذا الاستيراد يشير إلى تعريف Kid
 
 class CustomUserCard extends StatelessWidget {
   final Kid kid;
@@ -27,29 +23,31 @@ class CustomUserCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFFFFF8E5),
+        color: const Color(0xFFFFF8E5),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              SizedBox(width: 12),
+              // يمكنك إضافة صورة الطفل هنا إذا أردت
+              // CircleAvatar(backgroundImage: AssetImage(kid.avatarAsset)),
+              const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     kid.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: Color(0xFFFBB600),
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     'Age: ${kid.age}',
                     style: TextStyle(
@@ -66,15 +64,15 @@ class CustomUserCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Spacer(),
-              RegisterKidView(),
+              const Spacer(),
+              // تمت إزالة RegisterKidView() من هنا
               CustomActionBottom(
                 icon: CustomSvg(assetPath: AppAssets.switchKid),
                 onPressed: onSwitchKid,
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -112,9 +110,9 @@ class CustomUserCard extends StatelessWidget {
                     vertical: 10.0,
                   ),
                 ),
-                child: Text('Lock',
+                child: const Text('Lock',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 18),
                 ),
               ),
             ],

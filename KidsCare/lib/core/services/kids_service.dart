@@ -1,21 +1,28 @@
 import 'dart:convert';
+import 'package:flutter/material.dart'; // import this for ValueNotifier
 import 'package:kidscare/core/cache/cache_helper.dart';
 import 'package:kidscare/core/cache/cache_keys.dart';
 
 class KidsService {
   static final KidsService _instance = KidsService._internal();
   factory KidsService() => _instance;
-  KidsService._internal();
+  KidsService._internal() {
+    loadFromCache(); // Load data when the service is initialized
+  }
 
   String? _userEmail;
   String? _userName;
   String? _parentName;
   String? _parentPhotoPath;
-  final List<Map<String, String>> _kids = [];
+  // Change _kids to be managed by ValueNotifier
+  final ValueNotifier<List<Map<String, String>>> _kidsNotifier = ValueNotifier([]);
   int _firstKidIndex = 0;
 
-  // Getter for unmodifiable kids list
-  List<Map<String, String>> get kids => List.unmodifiable(_kids);
+  // Getter for unmodifiable kids list (now from the notifier)
+  List<Map<String, String>> get kids => List.unmodifiable(_kidsNotifier.value);
+
+  // Expose the ValueNotifier for UI listeners
+  ValueNotifier<List<Map<String, String>>> get kidsNotifier => _kidsNotifier;
 
   // Getter for first kid index
   int get firstKidIndex => _firstKidIndex;
@@ -39,7 +46,7 @@ class KidsService {
     }
     _userEmail = email;
     await CacheHelper.saveData(key: CacheKeys.userEmail, value: email);
-    // Load kids for this user when email is set
+    // Load kids for this user when email is set, and update notifier
     await loadKidsForUser(email);
   }
 
@@ -81,7 +88,10 @@ class KidsService {
     if (!kid.containsKey('name') || !kid.containsKey('email') || !kid.containsKey('age')) {
       throw Exception('Kid data must contain name, email, and age');
     }
-    _kids.add(kid);
+
+    // Create a new list to trigger ValueNotifier update
+    final updatedKids = List<Map<String, String>>.from(_kidsNotifier.value)..add(kid);
+    _kidsNotifier.value = updatedKids; // Update the notifier's value
     await _saveKidsToCache();
   }
 
@@ -91,7 +101,7 @@ class KidsService {
       throw Exception('User email must be set before saving kids');
     }
     try {
-      final kidsJson = jsonEncode(_kids);
+      final kidsJson = jsonEncode(_kidsNotifier.value); // Encode from notifier's value
       await CacheHelper.saveData(
         key: 'kids_${_userEmail}',
         value: kidsJson,
@@ -112,15 +122,24 @@ class KidsService {
       final kidsJson = await CacheHelper.getData(key: 'kids_$email') as String?;
       if (kidsJson != null) {
         final List<dynamic> decodedKids = jsonDecode(kidsJson);
-        _kids.clear();
-        _kids.addAll(decodedKids.map((kid) => Map<String, String>.from(kid)));
+        // Update the notifier's value directly
+        _kidsNotifier.value = decodedKids.map((kid) => Map<String, String>.from(kid)).toList();
+      } else {
+        _kidsNotifier.value = []; // Clear list if no kids found
       }
 
       // Load first kid index
       final firstKidIndexStr = await CacheHelper.getData(key: 'first_kid_$email') as String?;
       if (firstKidIndexStr != null) {
         _firstKidIndex = int.parse(firstKidIndexStr);
+      } else {
+        _firstKidIndex = 0; // Reset if no index found
       }
+      // Ensure the firstKidIndex is valid if kids were just loaded/cleared
+      if (_firstKidIndex >= _kidsNotifier.value.length) {
+        _firstKidIndex = _kidsNotifier.value.isEmpty ? 0 : _kidsNotifier.value.length - 1;
+      }
+
     } catch (e) {
       throw Exception('Failed to load kids for user: $e');
     }
@@ -133,7 +152,7 @@ class KidsService {
       _userName = await CacheHelper.getData(key: CacheKeys.userName) as String?;
       _parentName = await CacheHelper.getData(key: CacheKeys.parentName) as String?;
       _parentPhotoPath = await CacheHelper.getData(key: CacheKeys.parentPhotoPath) as String?;
-      
+
       if (_userEmail != null) {
         await loadKidsForUser(_userEmail!);
       }
@@ -147,7 +166,7 @@ class KidsService {
     if (_userEmail == null) {
       throw Exception('User email must be set before updating first kid');
     }
-    if (index < 0 || index >= _kids.length) {
+    if (index < 0 || index >= _kidsNotifier.value.length) {
       throw Exception('Invalid kid index');
     }
     _firstKidIndex = index;
@@ -155,12 +174,15 @@ class KidsService {
       key: 'first_kid_${_userEmail}',
       value: index.toString(),
     );
+    // You might want to trigger a UI update here if changing the selected kid affects other parts of the UI
+    // that don't directly listen to kidsNotifier but rely on firstKidIndex.
+    // For now, assume the UI managing the selected kid will handle its own setState.
   }
 
   // Get first kid
   Map<String, String>? getFirstKid() {
-    if (_kids.isEmpty) return null;
-    return _kids[_firstKidIndex];
+    if (_kidsNotifier.value.isEmpty) return null;
+    return _kidsNotifier.value[_firstKidIndex];
   }
 
   // Clear all data for current user
@@ -169,13 +191,13 @@ class KidsService {
       await CacheHelper.removeData(key: 'kids_${_userEmail}');
       await CacheHelper.removeData(key: 'first_kid_${_userEmail}');
     }
-    _kids.clear();
+    _kidsNotifier.value = []; // Clear the notifier's list
     _userEmail = null;
     _userName = null;
     _parentName = null;
     _parentPhotoPath = null;
     _firstKidIndex = 0;
-    
+
     await CacheHelper.removeData(key: CacheKeys.userEmail);
     await CacheHelper.removeData(key: CacheKeys.userName);
     await CacheHelper.removeData(key: CacheKeys.parentName);
@@ -186,24 +208,24 @@ class KidsService {
   bool canDeleteKid(int index) {
     print('Checking if kid can be deleted:');
     print('User Email: $_userEmail');
-    print('Kids List Length: ${_kids.length}');
+    print('Kids List Length: ${_kidsNotifier.value.length}');
     print('Index to delete: $index');
-    
+
     if (_userEmail == null) {
       print('Error: User email is not set');
       return false;
     }
-    
-    if (index < 0 || index >= _kids.length) {
-      print('Error: Invalid index $index for kids list of length ${_kids.length}');
+
+    if (index < 0 || index >= _kidsNotifier.value.length) {
+      print('Error: Invalid index $index for kids list of length ${_kidsNotifier.value.length}');
       return false;
     }
-    
-    if (_kids.length <= 1) {
+
+    if (_kidsNotifier.value.length <= 1) {
       print('Error: Cannot delete the only kid');
       return false;
     }
-    
+
     print('Kid can be deleted');
     return true;
   }
@@ -213,17 +235,20 @@ class KidsService {
     print('Attempting to delete kid:');
     print('User Email: $_userEmail');
     print('Index to delete: $index');
-    
+
     if (_userEmail == null) {
       throw Exception('User email must be set before deleting kid');
     }
-    if (index < 0 || index >= _kids.length) {
+    if (index < 0 || index >= _kidsNotifier.value.length) {
       throw Exception('Invalid kid index');
     }
-    
-    _kids.removeAt(index);
-    if (_firstKidIndex >= _kids.length) {
-      _firstKidIndex = _kids.isEmpty ? 0 : _kids.length - 1;
+
+    // Create a new list to trigger ValueNotifier update
+    final updatedKids = List<Map<String, String>>.from(_kidsNotifier.value)..removeAt(index);
+    _kidsNotifier.value = updatedKids; // Update the notifier's value
+
+    if (_firstKidIndex >= _kidsNotifier.value.length) {
+      _firstKidIndex = _kidsNotifier.value.isEmpty ? 0 : _kidsNotifier.value.length - 1;
     }
     await _saveKidsToCache();
     print('Kid deleted successfully');
@@ -234,13 +259,17 @@ class KidsService {
     if (_userEmail == null) {
       throw Exception('User email must be set before updating kid');
     }
-    if (index < 0 || index >= _kids.length) {
+    if (index < 0 || index >= _kidsNotifier.value.length) {
       throw Exception('Invalid kid index');
     }
     if (!kid.containsKey('name') || !kid.containsKey('email') || !kid.containsKey('age')) {
       throw Exception('Kid data must contain name, email, and age');
     }
-    _kids[index] = kid;
+
+    // Create a new list to trigger ValueNotifier update
+    final updatedKids = List<Map<String, String>>.from(_kidsNotifier.value);
+    updatedKids[index] = kid;
+    _kidsNotifier.value = updatedKids; // Update the notifier's value
     await _saveKidsToCache();
   }
-} 
+}

@@ -11,6 +11,9 @@ import 'package:kidscare/core/services/kids_service.dart';
 import 'package:kidscare/features/profile/views/kids_info_view.dart';
 import 'package:kidscare/features/home/views/map_view.dart';
 
+import '../../../core/widget/custom_svg.dart';
+import '../../kid/add_kid_view.dart' show RegisterKidView;
+import '../widgets/custom_action_btn.dart';
 import 'classify_view.dart';
 import 'live_display_view.dart';
 
@@ -70,6 +73,21 @@ class _HomeViewState extends State<HomeView> {
           // يمكنك إضافة NavigationDestination أخرى لـ 'School Page' إذا لزم الأمر
         ],
       ),
+      // ############### إضافة FloatingActionButton هنا ###############
+      floatingActionButton: _selectedIndex == 0 // أظهر الزر فقط في HomeTab
+          ? CustomActionBottom(
+        icon: CustomSvg(assetPath: AppAssets.addKid),
+        onPressed: () {
+          MyNavigator.goTo(screen: RegisterKidView(
+            onKidAdded: (newKidData) {
+              // لا تحتاج لعمل أي شيء هنا، ValueListenableBuilder في HomeTab سيتكفل بالتحديث
+            },
+          ));
+        },
+      )
+          : null, // لا تظهر الزر في الصفحات الأخرى
+      // ##############################################################
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // يمكنك تعديل الموقع
     );
   }
 }
@@ -82,29 +100,19 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  // استخدام KidsService للحصول على قائمة الأطفال
-  List<Kid> get kids => KidsService().kids
-      .map((k) => Kid(
-    name: k['name']!,
-    email: k['email']!,
-    age: k['age']!,
-    avatarAsset: AppAssets.image, // تأكد من أن AppAssets.image موجود ويحتوي على مسار صورة افتراضية
-  ))
-      .toList();
   int selectedKid = 0;
 
   @override
   void initState() {
     super.initState();
-    // تحميل البيانات من الكاش عند تهيئة الصفحة
-    KidsService().loadFromCache();
+    // لا تحتاج لـ loadFromCache هنا بعد الآن لأنها تستدعى في تهيئة KidsService
   }
 
   void switchKid(int index) {
     setState(() {
       selectedKid = index;
-      // تحديث الطفل الأول في KidsService إذا كان الفهرس صالحًا
-      if (index < KidsService().kids.length) {
+      // تحديث الطفل الأول في KidsService
+      if (index < KidsService().kids.length) { // لاحظ أن kids هنا ستأتي من ValueNotifier
         KidsService().updateFirstKid(index);
       }
     });
@@ -113,26 +121,21 @@ class _HomeTabState extends State<HomeTab> {
   void _goToKidsInfoView() async {
     // الانتقال إلى صفحة معلومات الأطفال
     await Navigator.push(context, MaterialPageRoute(builder: (_) => KidsInfoView()));
-    setState(() {}); // تحديث قائمة الأطفال بعد العودة من KidsInfoView (إذا تم إضافة/تعديل طفل)
+    // ليست هناك حاجة لـ setState هنا لأن KidsService.kidsNotifier ستتولى التحديث
   }
 
   @override
   Widget build(BuildContext context) {
-    // الحصول على بيانات الطفل المحدد حاليًا
-    final currentKid = KidsService().kids.isNotEmpty
-        ? KidsService().kids[selectedKid]
-        : null;
-
     return Column(
       children: [
-        const CustomAppBar(), // شريط التطبيق العلوي المخصص
+        const CustomAppBar(),
         Expanded(
-          child: SingleChildScrollView( // استخدام SingleChildScrollView للسماح بالتمرير
+          child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
                   child: Text(
                     'Welcome to App',
                     style: TextStyle(
@@ -142,30 +145,114 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                   ),
                 ),
-                if (currentKid != null) // عرض بطاقة المستخدم إذا كان هناك طفل متاح
-                  CustomUserCard(
-                    kid: Kid(
-                      name: currentKid['name']!,
-                      email: currentKid['email']!,
-                      age: currentKid['age']!,
-                      avatarAsset: AppAssets.image,
-                    ),
-                    onSwitchKid: () => showModalBottomSheet(
-                      context: context,
-                      builder: (_) => SwitchKidSheet(
-                        kids: kids,
-                        selected: selectedKid,
-                        onSelect: (i) {
-                          switchKid(i);
-                          Navigator.pop(context); // إغلاق الـ BottomSheet بعد اختيار طفل
-                        },
-                      ),
-                    ),
-                  ),
+                // ############## استخدام ValueListenableBuilder هنا ##############
+                ValueListenableBuilder<List<Map<String, String>>>(
+                  valueListenable: KidsService().kidsNotifier, // الاستماع إلى kidsNotifier
+                  builder: (context, kidsList, child) {
+                    final currentKid = kidsList.isNotEmpty
+                        ? kidsList[selectedKid]
+                        : null;
 
-                // ################## إضافة جزء "Current Location" هنا ##################
+                    // تأكد من أن selectedKid لا يتجاوز حجم القائمة
+                    if (selectedKid >= kidsList.length && kidsList.isNotEmpty) {
+                      selectedKid = 0; // أو أي منطق آخر لإعادة تعيينه
+                    } else if (kidsList.isEmpty) {
+                      selectedKid = 0;
+                    }
+
+                    return Column(
+                      children: [
+                        if (currentKid != null)
+                          CustomUserCard(
+                            kid: Kid(
+                              name: currentKid['name']!,
+                              email: currentKid['email']!,
+                              age: currentKid['age']!,
+                              avatarAsset: AppAssets.image,
+                            ),
+                            onSwitchKid: () => showModalBottomSheet(
+                              context: context,
+                              builder: (_) => SwitchKidSheet(
+                                kids: kidsList.map((k) => Kid(
+                                  name: k['name']!,
+                                  email: k['email']!,
+                                  age: k['age']!,
+                                  avatarAsset: AppAssets.image,
+                                )).toList(),
+                                selected: selectedKid,
+                                onSelect: (i) {
+                                  switchKid(i);
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          )
+                        else
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Card(
+                              elevation: 2.0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'No kids added yet. Please add a child to get started.',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 16, color: AppColors.blue),
+                                    ),
+                                    const SizedBox(height: 15),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        MyNavigator.goTo(screen: RegisterKidView(
+                                          onKidAdded: (newKidData) {
+                                            // لا يزال يجب تمرير الدالة لأن RegisterKidView تتوقعها،
+                                            // لكن لا تحتاج لعمل أي شيء هنا لأن ValueListenableBuilder سيتكفل بالتحديث
+                                          },
+                                        ));
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.yellowLight,
+                                        foregroundColor: AppColors.blue,
+                                      ),
+                                      child: const Text('Add New Kid'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+                // ##############################################################
+
                 const CurrentLocationSection(),
-                // ###################################################################
+               // const SizedBox(height: 10.0),
+               Padding(
+                 padding: const EdgeInsets.all(16.0),
+                 child: Column(children: [
+                   CustomFeatureButton(
+                   text: 'Classify content',
+                   icon: Icons.notes,
+                   onTap: () {
+                     MyNavigator.goTo(screen: ClassifyContentView());
+                   },
+                 ),
+                   const SizedBox(height: 15.0),
+                   CustomFeatureButton(
+                     text: 'Live Display',
+                     icon: Icons.remove_red_eye_outlined,
+                     onTap: () {
+                       MyNavigator.goTo(screen: LiveDisplayView());
+                     },
+                   ),],
+                 ),
+               ),
               ],
             ),
           ),
@@ -175,7 +262,6 @@ class _HomeTabState extends State<HomeTab> {
   }
 }
 
-// Widget الجديد لتمثيل قسم "Current Location"
 class CurrentLocationSection extends StatefulWidget {
   const CurrentLocationSection({super.key});
 
@@ -186,8 +272,7 @@ class CurrentLocationSection extends StatefulWidget {
 class _CurrentLocationSectionState extends State<CurrentLocationSection> {
   late GoogleMapController mapController;
 
-  // إحداثيات مركز الخريطة (مثال: مدينة العاشر من رمضان)
-  static const LatLng _center = LatLng(30.6033, 31.7337); // Tenth of Ramadan City
+  static const LatLng _center = LatLng(30.6033, 31.7337);
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -200,27 +285,26 @@ class _CurrentLocationSectionState extends State<CurrentLocationSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text( // هذا النص غير قابل للنقر الآن
-            'current location',
+          const Text(
+            'Current Location',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppColors.blue,
             ),
           ),
           const SizedBox(height: 12.0),
-          // كارد الخريطة بالكامل، يحتوي الآن على الخريطة والزر
-          Card( // استخدام Card مباشرة هنا ليكون هو الكارد الأساسي
+          Card(
             elevation: 3.0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15.0),
             ),
-            child: Container(
-              height: 270, // زيادة الارتفاع لاستيعاب الزر
+            child: SizedBox(
+              height: 270,
               width: double.infinity,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15.0),
-                child: Stack( // استخدام Stack لوضع العناصر فوق بعضها
+                child: Stack(
                   children: [
                     GoogleMap(
                       onMapCreated: _onMapCreated,
@@ -240,22 +324,22 @@ class _CurrentLocationSectionState extends State<CurrentLocationSection> {
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
-                        padding: const EdgeInsets.all(12.0), // مسافة داخلية للزر
+                        padding: const EdgeInsets.all(12.0),
                         child: SizedBox(
-                          width: double.infinity, // لجعل الزر يأخذ عرض الكارد بالكامل
+                          width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
                               MyNavigator.goTo(screen: MapView());
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.yellow, // لون الزر
+                              backgroundColor: AppColors.yellow,
                               padding: const EdgeInsets.symmetric(vertical: 12.0),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0), // حواف دائرية للزر
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
                             ),
                             child: const Text(
-                              'Explore Location', // نص الزر
+                              'Explore Location',
                               style: TextStyle(
                                 color: AppColors.blue,
                                 fontSize: 16,
@@ -271,25 +355,7 @@ class _CurrentLocationSectionState extends State<CurrentLocationSection> {
               ),
             ),
           ),
-          const SizedBox(height: 20.0), // مسافة بعد كارد الخريطة الجديد
 
-          // زر "Classify content" (بقي كما هو خارج كارد الخريطة)
-          CustomFeatureButton(
-            text: 'Classify content',
-            icon: Icons.notes,
-            onTap: () {
-              MyNavigator.goTo(screen: ClassifyContentView());
-            },
-          ),
-          const SizedBox(height: 15.0),
-          // زر "Live Display" (بقي كما هو خارج كارد الخريطة)
-          CustomFeatureButton(
-            text: 'Live Display',
-            icon: Icons.remove_red_eye_outlined,
-            onTap: () {
-              MyNavigator.goTo(screen: LiveDisplayView());
-            },
-          ),
         ],
       ),
     );
@@ -311,6 +377,7 @@ class CustomFeatureButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: AppColors.white,
       elevation: 3.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),

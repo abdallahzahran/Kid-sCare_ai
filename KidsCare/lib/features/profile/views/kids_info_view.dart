@@ -149,7 +149,10 @@ class _KidsInfoViewState extends State<KidsInfoView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
+        backgroundColor: AppColors.white,
+
         title: const Text('Kids Info'),
         centerTitle: true,
         elevation: 0,

@@ -26,34 +26,19 @@ class _ClassifyContentViewState extends State<ClassifyContentView> {
     'قمار',
     'إباحية',
     'عنف',
-    'إرهاب',
-    'احتيال',
-
   ];
 
 
   final List<String> _blockWords = [
+    'مخدرات',
+    'كحول',
+    'قمار',
+    'إباحية',
     'عنف',
-    'عنف',
-    'إرهاب',
-    'احتيال',
-    'عنف',
-    'إرهاب',
-    'احتيال',
   ];
 
 
   final List<HistoryItem> _history = [
-    HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'احتيال'),
-    HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'عنف'),
-    HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'إرهاب'),
-    HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'إباحية'),
-    HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'قمار'),
-    HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'مخدرات'),
-    HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'احتيال'),
-    HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'عنف'),
-    HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'إرهاب'),
-    HistoryItem(time: '11:00 AM', date: '2/10/2025', content: 'محتوى جديد'),
   ];
 
   @override
@@ -96,6 +81,7 @@ class _ClassifyContentViewState extends State<ClassifyContentView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,

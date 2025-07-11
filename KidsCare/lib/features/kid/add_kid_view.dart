@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kidscare/core/widget/custom_text_form.dart';
 import 'package:kidscare/features/home/widgets/custom_action_btn.dart';
 import '../../core/helper/my_bottom_sheet.dart';
-import '../../core/helper/my_navigator.dart';
 import '../../core/helper/my_responsive.dart';
 import '../../core/helper/my_validator.dart';
 import '../../core/utils/app_assets.dart';
@@ -10,7 +9,6 @@ import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_text_styles.dart';
 import '../../core/widget/custom_elvated_btn.dart';
 import '../../core/widget/custom_svg.dart';
-import '../auth/views/login_view.dart';
 import 'package:kidscare/core/services/kids_service.dart';
 
 class RegisterKidView extends StatelessWidget {

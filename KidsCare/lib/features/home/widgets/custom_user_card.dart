@@ -3,6 +3,8 @@ import 'package:kidscare/core/utils/app_assets.dart';
 import 'package:kidscare/core/widget/custom_svg.dart';
 import '../../../core/helper/my_navigator.dart';
 import '../../../core/utils/app_colors.dart';
+import '../../kid/add_kid_view.dart';
+import '../../kid/add_kid_view.dart';
 import '../../kid/app_list_view.dart';
 import '../../kid/history_calls_view.dart';
 import '../../time/views/bounus_time.dart';
@@ -44,7 +46,7 @@ class CustomUserCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFFFBB600),
+                      color: AppColors.blue,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -65,8 +67,11 @@ class CustomUserCard extends StatelessWidget {
                 ],
               ),
               const Spacer(),
-              // تمت إزالة RegisterKidView() من هنا
-              CustomActionBottom(
+              RegisterKidView(
+                onKidAdded: (Map<String, String> kidData) {
+                  print('Kid added: ${kidData['name']}');
+                },
+              ),              CustomActionBottom(
                 icon: CustomSvg(assetPath: AppAssets.switchKid),
                 onPressed: onSwitchKid,
               ),

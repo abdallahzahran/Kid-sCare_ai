@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidscare/core/utils/app_colors.dart';
 
 
 class HistoryScreen extends StatefulWidget {
@@ -27,7 +28,9 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
+        backgroundColor: AppColors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -65,59 +68,18 @@ class CallsList extends StatelessWidget {
   // بيانات وهمية للمكالمات
   final List<Map<String, String>> calls = const [
     {
-      'name': 'Yousef Mohamed',
+      'name': 'Ali Mohamed',
       'number': '+2 01028865565',
-      'time': '7:04 PM',
+      'time': '10:04 PM',
       'icon': 'call_received', // أو يمكنك استخدام مسار صورة
     },
     {
-      'name': 'Yousef Mohamed',
-      'number': '+2 01028865565',
+      'name': 'Yousef Marwan',
+      'number': '+2 01125861595',
       'time': '7:04 PM',
       'icon': 'call_received',
     },
-    {
-      'name': 'Yousef Mohamed',
-      'number': '+2 01028865565',
-      'time': '7:04 PM',
-      'icon': 'call_received',
-    },
-    {
-      'name': 'Yousef Mohamed',
-      'number': '+2 01028865565',
-      'time': '7:04 PM',
-      'icon': 'call_received',
-    },
-    {
-      'name': 'Yousef Mohamed',
-      'number': '+2 01028865565',
-      'time': '7:04 PM',
-      'icon': 'call_received',
-    },
-    {
-      'name': 'Yousef Mohamed',
-      'number': '+2 01028865565',
-      'time': '7:04 PM',
-      'icon': 'call_received',
-    },
-    {
-      'name': 'Yousef Mohamed',
-      'number': '+2 01028865565',
-      'time': '7:04 PM',
-      'icon': 'call_received',
-    },
-    {
-      'name': 'Yousef Mohamed',
-      'number': '+2 01028865565',
-      'time': '7:04 PM',
-      'icon': 'call_received',
-    },
-    {
-      'name': 'Yousef Mohamed',
-      'number': '+2 01028865565',
-      'time': '7:04 PM',
-      'icon': 'call_received',
-    },
+
   ];
 
   @override
@@ -128,6 +90,7 @@ class CallsList extends StatelessWidget {
       itemBuilder: (context, index) {
         final call = calls[index];
         return Card(
+          color: AppColors.white,
           margin: const EdgeInsets.symmetric(vertical: 6.0),
           elevation: 2.0,
           shape: RoundedRectangleBorder(
@@ -138,20 +101,20 @@ class CallsList extends StatelessWidget {
             child: Row(
               children: [
                 // الصورة الدائرية (يمكن استبدالها بصورة حقيقية أو أول حرف من الاسم)
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: const BoxDecoration(
-                    color: Colors.amber, // لون أصفر كما في الصورة
-                    shape: BoxShape.circle,
-                  ),
-                  // child: Center(
-                  //   child: Text(
-                  //     call['name']![0], // أول حرف من الاسم
-                  //     style: const TextStyle(color: Colors.white, fontSize: 20),
-                  //   ),
-                  // ),
-                ),
+                // Container(
+                //   width: 50,
+                //   height: 50,
+                //   decoration: const BoxDecoration(
+                //     color: Colors.amber, // لون أصفر كما في الصورة
+                //     shape: BoxShape.circle,
+                //   ),
+                //   // child: Center(
+                //   //   child: Text(
+                //   //     call['name']![0], // أول حرف من الاسم
+                //   //     style: const TextStyle(color: Colors.white, fontSize: 20),
+                //   //   ),
+                //   // ),
+                // ),
                 const SizedBox(width: 16.0),
                 Expanded(
                   child: Column(
@@ -214,50 +177,21 @@ class SmsList extends StatelessWidget {
   // بيانات وهمية للرسائل
   final List<Map<String, String>> sms = const [
     {
-      'sender': 'Vodafone',
+      'sender': 'Orange',
       'message': 'Length of one SMS includes up to 160 English characters or 70 Arabic',
       'time': 'Just now',
     },
     {
       'sender': 'Vodafone',
       'message': 'Length of one SMS includes up to 160 English characters or 70 Arabic',
-      'time': 'Just now',
+      'time': '10 m',
     },
     {
-      'sender': 'Vodafone',
+      'sender': 'Etisalat',
       'message': 'Length of one SMS includes up to 160 English characters or 70 Arabic',
-      'time': 'Just now',
+      'time': '1 h',
     },
-    {
-      'sender': 'Vodafone',
-      'message': 'Length of one SMS includes up to 160 English characters or 70 Arabic',
-      'time': 'Just now',
-    },
-    {
-      'sender': 'Vodafone',
-      'message': 'Length of one SMS includes up to 160 English characters or 70 Arabic',
-      'time': 'Just now',
-    },
-    {
-      'sender': 'Vodafone',
-      'message': 'Length of one SMS includes up to 160 English characters or 70 Arabic',
-      'time': 'Just now',
-    },
-    {
-      'sender': 'Vodafone',
-      'message': 'Length of one SMS includes up to 160 English characters or 70 Arabic',
-      'time': 'Just now',
-    },
-    {
-      'sender': 'Vodafone',
-      'message': 'Length of one SMS includes up to 160 English characters or 70 Arabic',
-      'time': 'Just now',
-    },
-    {
-      'sender': 'Vodafone',
-      'message': 'Length of one SMS includes up to 160 English characters or 70 Arabic',
-      'time': 'Just now',
-    },
+
   ];
 
   @override
@@ -268,6 +202,7 @@ class SmsList extends StatelessWidget {
       itemBuilder: (context, index) {
         final message = sms[index];
         return Card(
+          color: AppColors.white,
           margin: const EdgeInsets.symmetric(vertical: 6.0),
           elevation: 2.0,
           shape: RoundedRectangleBorder(
@@ -278,20 +213,20 @@ class SmsList extends StatelessWidget {
             child: Row(
               children: [
                 // الصورة الدائرية
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: const BoxDecoration(
-                    color: Colors.amber, // لون أصفر كما في الصورة
-                    shape: BoxShape.circle,
-                  ),
-                  // child: Center(
-                  //   child: Text(
-                  //     message['sender']![0], // أول حرف من اسم المرسل
-                  //     style: const TextStyle(color: Colors.white, fontSize: 20),
-                  //   ),
-                  // ),
-                ),
+                // Container(
+                //   width: 50,
+                //   height: 50,
+                //   decoration: const BoxDecoration(
+                //     color: Colors.amber, // لون أصفر كما في الصورة
+                //     shape: BoxShape.circle,
+                //   ),
+                //   // child: Center(
+                //   //   child: Text(
+                //   //     message['sender']![0], // أول حرف من اسم المرسل
+                //   //     style: const TextStyle(color: Colors.white, fontSize: 20),
+                //   //   ),
+                //   // ),
+                // ),
                 const SizedBox(width: 16.0),
                 Expanded(
                   child: Column(

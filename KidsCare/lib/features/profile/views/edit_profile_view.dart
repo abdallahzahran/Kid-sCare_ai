@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidscare/core/utils/app_colors.dart';
 import 'package:kidscare/core/widget/custom_text_form.dart';
 import 'package:kidscare/core/widget/custom_elvated_btn.dart';
 import 'package:kidscare/core/helper/my_validator.dart';
@@ -45,7 +46,9 @@ class _EditProfileViewState extends State<EditProfileView> {
     final double maxFormWidth = MyResponsive.width(context, value: 350);
 
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
+        backgroundColor: AppColors.white,
         title: const Text('Edit Profile'),
         centerTitle: true,
         elevation: 0,

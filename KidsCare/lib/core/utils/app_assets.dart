@@ -20,6 +20,8 @@ abstract class AppAssets {
   static const String logOut = "${basePathIcon}logout.svg";
   static const String kid = "${basePathIcon}kid.svg";
   static const String settings = "${basePathIcon}setting.svg";
+  static const String noti = "${basePathIcon}body.svg";
+  static const String scr = "${basePathIcon}Img_out-box_light.svg";
   // Assets image
   static const String basePathImage = "assets/images/";
   static const String image = "${basePathImage}profile.png";

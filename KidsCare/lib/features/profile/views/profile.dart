@@ -26,6 +26,7 @@ class _ProfileViewState extends State<ProfileView> {
     bool photoExists = parentPhotoFile != null && parentPhotoFile.existsSync();
     
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kidscare/core/utils/app_colors.dart';
 import 'package:kidscare/core/utils/app_assets.dart';
 
+import '../../../core/widget/custom_svg.dart' show CustomSvg;
+
 class LiveDisplayView extends StatefulWidget {
   const LiveDisplayView({super.key});
 
@@ -13,6 +15,7 @@ class _LiveDisplayViewState extends State<LiveDisplayView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
@@ -31,35 +34,43 @@ class _LiveDisplayViewState extends State<LiveDisplayView> {
       body: SafeArea(
         child: Column(
           children: [
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200], // لون خلفية الكارد
-                      borderRadius: BorderRadius.circular(15.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.3),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Image.asset(
-                        AppAssets.liveDisplayImage, // ############## مسار الصورة هنا ##############
-                        fit: BoxFit.cover, // لجعل الصورة تغطي المساحة المتاحة مع الحفاظ على الأبعاد
-                        // يمكنك إضافة placeholder أو errorBuilder هنا لتحسين تجربة المستخدم
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            // Expanded(
+            //   child: Center(
+            //     child: Padding(
+            //       padding: const EdgeInsets.all(16.0),
+            //       child: Container(
+            //         decoration: BoxDecoration(
+            //           color: Colors.grey[200], // لون خلفية الكارد
+            //           borderRadius: BorderRadius.circular(15.0),
+            //           boxShadow: [
+            //             BoxShadow(
+            //               color: Colors.grey.withOpacity(0.3),
+            //               spreadRadius: 2,
+            //               blurRadius: 5,
+            //               offset: const Offset(0, 3),
+            //             ),
+            //           ],
+            //         ),
+            //         child: ClipRRect(
+            //           borderRadius: BorderRadius.circular(15.0),
+            //           child: Image.asset(
+            //             AppAssets.liveDisplayImage, // ############## مسار الصورة هنا ##############
+            //             fit: BoxFit.cover, // لجعل الصورة تغطي المساحة المتاحة مع الحفاظ على الأبعاد
+            //             // يمكنك إضافة placeholder أو errorBuilder هنا لتحسين تجربة المستخدم
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            Spacer(flex: 2,),
+            CustomSvg(assetPath: AppAssets.scr,width: 200,height: 200,),
+            Text("No display Screen now",
+              style: TextStyle(
+              fontSize: 18,
+              color: AppColors.grayDark2, // لون النص من AppColors
+            ),),
+            Spacer(flex: 3,),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: SizedBox(
@@ -88,6 +99,7 @@ class _LiveDisplayViewState extends State<LiveDisplayView> {
                 ),
               ),
             ),
+            Spacer(flex: 1,),
           ],
         ),
       ),

@@ -15,12 +15,12 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this); // عدد التبويبات هو 2 (Calls و SMS)
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
-    _tabController.dispose(); // التخلص من الـ TabController عند التخلص من الـ Widget
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -29,16 +29,15 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // زر الرجوع
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // يمكن إضافة وظيفة للعودة إلى الشاشة السابقة هنا
              Navigator.pop(context);
           },
         ),
-        title: const Text('History Calls & SMS'), // عنوان الشريط العلوي
-        centerTitle: true, // توسيط العنوان
+        title: const Text('History Calls & SMS'),
+        centerTitle: true,
         bottom: TabBar(
-          controller: _tabController, // ربط الـ TabBar بالـ TabController
+          controller: _tabController,
           tabs: const [
             Tab(text: 'Calls'), // تبويب المكالمات
             Tab(text: 'SMS'), // تبويب الرسائل

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:kidscare/core/utils/app_colors.dart'; // تأكد من المسار الصحيح لملف AppColors
+import 'package:kidscare/core/utils/app_colors.dart';
 
 class MapView extends StatefulWidget {
   const MapView({super.key});
@@ -12,10 +12,8 @@ class MapView extends StatefulWidget {
 class _MapViewState extends State<MapView> {
   late GoogleMapController mapController;
 
-  // إحداثيات مركز الخريطة الافتراضي (يمكنك تغييرها)
-  static const LatLng _center = LatLng(30.6033, 31.7337); // Tenth of Ramadan City, Egypt
+  static const LatLng _center = LatLng(30.6033, 31.7337);
 
-  // مجموعة من العلامات (Markers) لعرضها على الخريطة
   final Set<Marker> _markers = {
     const Marker(
       markerId: MarkerId('currentLocation'),
@@ -32,12 +30,12 @@ class _MapViewState extends State<MapView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.white, // استخدم نفس لون الـ AppBar في تطبيقك
+        backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.blue),
           onPressed: () {
-            Navigator.pop(context); // للعودة إلى الشاشة السابقة
+            Navigator.pop(context);
           },
         ),
         title: const Text(
@@ -50,15 +48,15 @@ class _MapViewState extends State<MapView> {
         children: [
           GoogleMap(
             onMapCreated: _onMapCreated,
-            initialCameraPosition: const CameraPosition( // ############## تم تصحيح هذا السطر ##############
+            initialCameraPosition: const CameraPosition(
               target: _center,
               zoom: 15.0,
             ),
-            markers: _markers, // إضافة العلامات إلى الخريطة
-            myLocationButtonEnabled: true, // تفعيل زر موقعي
-            zoomControlsEnabled: true, // تفعيل أزرار التكبير/التصغير
+            markers: _markers,
+            myLocationButtonEnabled: true,
+            zoomControlsEnabled: true,
           ),
-          // يمكنك إضافة زر تتبع الطفل هنا إذا أردت
+
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
@@ -76,14 +74,14 @@ class _MapViewState extends State<MapView> {
                           CircleAvatar(
                             radius: 24,
                             backgroundColor: Colors.grey[200],
-                            child: const Icon(Icons.person, color: AppColors.blue), // يمكنك استبدالها بصورة الطفل
+                            child: const Icon(Icons.person, color: AppColors.blue),
                           ),
                           const SizedBox(width: 16),
                           const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Ali Mohamed', // هذا الاسم يمكنك جعله ديناميكيًا لاحقًا
+                                'Ali Mohamed',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -91,7 +89,7 @@ class _MapViewState extends State<MapView> {
                                 ),
                               ),
                               Text(
-                                'First Kid', // هذا الوصف يمكنك جعله ديناميكيًا لاحقًا
+                                'First Kid',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey,
@@ -106,7 +104,6 @@ class _MapViewState extends State<MapView> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            // TODO: أضف منطق تتبع الطفل هنا
                             print('Track Kid Tapped!');
                           },
                           style: ElevatedButton.styleFrom(

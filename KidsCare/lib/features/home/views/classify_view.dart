@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:kidscare/core/helper/my_navigator.dart'; // تأكد من مسار ملف MyNavigator
-import 'package:kidscare/core/utils/app_colors.dart'; // تأكد من مسار ملف AppColors
+import 'package:kidscare/core/utils/app_colors.dart';
 
-// موديل بسيط لتمثيل عنصر في سجل التاريخ
 class HistoryItem {
   final String time;
   final String date;
@@ -20,10 +17,9 @@ class ClassifyContentView extends StatefulWidget {
 }
 
 class _ClassifyContentViewState extends State<ClassifyContentView> {
-  // للتحكم في حقل إدخال الكلمات المحظورة
+
   final TextEditingController _badWordsController = TextEditingController();
 
-  // قائمة الفئات المتاحة
   final List<String> _categories = [
     'مخدرات',
     'كحول',
@@ -32,10 +28,10 @@ class _ClassifyContentViewState extends State<ClassifyContentView> {
     'عنف',
     'إرهاب',
     'احتيال',
-    // أضف المزيد من الفئات هنا
+
   ];
 
-  // قائمة الكلمات المحظورة حاليًا (بيانات وهمية)
+
   final List<String> _blockWords = [
     'عنف',
     'عنف',
@@ -46,7 +42,7 @@ class _ClassifyContentViewState extends State<ClassifyContentView> {
     'احتيال',
   ];
 
-  // سجل التاريخ (بيانات وهمية)
+
   final List<HistoryItem> _history = [
     HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'احتيال'),
     HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'عنف'),
@@ -57,7 +53,7 @@ class _ClassifyContentViewState extends State<ClassifyContentView> {
     HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'احتيال'),
     HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'عنف'),
     HistoryItem(time: '10:00 AM', date: '2/10/2025', content: 'إرهاب'),
-    HistoryItem(time: '11:00 AM', date: '2/10/2025', content: 'محتوى جديد'), // مثال لبيانات إضافية
+    HistoryItem(time: '11:00 AM', date: '2/10/2025', content: 'محتوى جديد'),
   ];
 
   @override
@@ -66,32 +62,32 @@ class _ClassifyContentViewState extends State<ClassifyContentView> {
     super.dispose();
   }
 
-  // دالة لإضافة كلمة محظورة جديدة
+
   void _addBlockWord() {
     if (_badWordsController.text.isNotEmpty) {
       setState(() {
         _blockWords.add(_badWordsController.text);
-        // يمكنك إضافة الكلمة إلى سجل التاريخ أيضًا إذا أردت
+
         _history.insert(0, HistoryItem(time: _getCurrentTime(), date: _getCurrentDate(), content: _badWordsController.text));
         _badWordsController.clear();
       });
     }
   }
 
-  // دالة لإزالة كلمة محظورة
+
   void _removeBlockWord(int index) {
     setState(() {
       _blockWords.removeAt(index);
     });
   }
 
-  // دالة للحصول على الوقت الحالي (مثال)
+
   String _getCurrentTime() {
     final now = DateTime.now();
     return '${now.hour}:${now.minute.toString().padLeft(2, '0')} ${now.hour < 12 ? 'AM' : 'PM'}';
   }
 
-  // دالة للحصول على التاريخ الحالي (مثال)
+
   String _getCurrentDate() {
     final now = DateTime.now();
     return '${now.month}/${now.day}/${now.year}';

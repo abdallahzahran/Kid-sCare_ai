@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:kidscare/core/helper/my_navigator.dart'; // تأكد من وجود هذا الملف وتعريفه
+import 'package:kidscare/core/helper/my_navigator.dart';
 import 'package:kidscare/core/utils/app_colors.dart';
 import 'package:kidscare/features/home/widgets/custom_app_bar.dart';
 import 'package:kidscare/features/home/widgets/custom_user_card.dart';
@@ -12,7 +12,7 @@ import 'package:kidscare/features/profile/views/kids_info_view.dart';
 import 'package:kidscare/features/home/views/map_view.dart';
 
 import 'classify_view.dart';
-import 'live_display_view.dart'; // ############## المسار الصحيح لصفحة الخريطة ##############
+import 'live_display_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -230,12 +230,12 @@ class _CurrentLocationSectionState extends State<CurrentLocationSection> {
                       ),
                       myLocationButtonEnabled: false,
                       zoomControlsEnabled: false,
-                       markers: {
-                         const Marker(
-                           markerId: MarkerId('smallMapLocation'),
-                           position: _center,
+                      markers: {
+                        const Marker(
+                          markerId: MarkerId('smallMapLocation'),
+                          position: _center,
                         ),
-                       },
+                      },
                     ),
                     Align(
                       alignment: Alignment.bottomCenter,
@@ -278,7 +278,7 @@ class _CurrentLocationSectionState extends State<CurrentLocationSection> {
             text: 'Classify content',
             icon: Icons.notes,
             onTap: () {
-             MyNavigator.goTo(screen: ClassifyContentView());
+              MyNavigator.goTo(screen: ClassifyContentView());
             },
           ),
           const SizedBox(height: 15.0),

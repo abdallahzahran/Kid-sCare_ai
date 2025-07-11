@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kidscare/core/helper/my_navigator.dart'; // تأكد من مسار ملف MyNavigator
-import 'package:kidscare/core/utils/app_colors.dart'; // تأكد من مسار ملف AppColors
-import 'package:kidscare/core/utils/app_assets.dart'; // تأكد من مسار ملف AppAssets
+import 'package:kidscare/core/utils/app_colors.dart';
+import 'package:kidscare/core/utils/app_assets.dart';
 
 class LiveDisplayView extends StatefulWidget {
   const LiveDisplayView({super.key});

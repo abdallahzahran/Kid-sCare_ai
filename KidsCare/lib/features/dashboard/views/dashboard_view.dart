@@ -59,7 +59,7 @@ class DashboardView extends StatelessWidget {
           children: [
             // Chart Card
             Container(
-              height: 190, // تم زيادة الارتفاع
+              height: 190,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFF6DC),

@@ -2,8 +2,8 @@ class RegisterModel {
   final String? username;
   final String email;
   final String password;
-  final String? message; // خليناه nullable
-  final int? statusCode; // خليناه nullable
+  final String? message;
+  final int? statusCode;
 
   RegisterModel({this.username, required this.email, required this.password, this.message, this.statusCode});
 

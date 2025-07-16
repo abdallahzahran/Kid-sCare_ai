@@ -170,11 +170,9 @@ class CallsList extends StatelessWidget {
   }
 }
 
-// Widget لعرض قائمة الرسائل النصية
 class SmsList extends StatelessWidget {
   const SmsList({super.key});
 
-  // بيانات وهمية للرسائل
   final List<Map<String, String>> sms = const [
     {
       'sender': 'Orange',
@@ -187,7 +185,7 @@ class SmsList extends StatelessWidget {
       'time': '10 m',
     },
     {
-      'sender': 'Etisalat',
+      'sender': 'Orange',
       'message': 'Length of one SMS includes up to 160 English characters or 70 Arabic',
       'time': '1 h',
     },
